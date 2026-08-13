@@ -4,7 +4,7 @@
 - Project Name: QuickChat (AI-DLC 데모, 1회차 멘토링용)
 - Project Type: Greenfield
 - Start Date: 2026-08-13T06:36:01Z
-- Current Stage: INCEPTION - Workflow Planning (execution-plan.md 생성 완료, 승인 대기)
+- Current Stage: INCEPTION - Application Design (완료, 승인 대기)
 
 ## Workspace State
 - Existing Code: No
@@ -22,7 +22,7 @@
 - [x] Requirements Analysis (requirements.md 생성 및 사용자 승인 완료)
 - [x] User Stories (personas.md/stories.md 생성 및 사용자 승인 완료)
 - [x] Workflow Planning (execution-plan.md 생성, 승인 대기)
-- [ ] Application Design (권고: EXECUTE - execution-plan.md 참고)
+- [x] Application Design (5개 컴포넌트 + ChatFacadeService 정의 완료, 승인 대기)
 - [ ] Units Generation (권고: EXECUTE - Backend/Frontend 2개 유닛)
 
 ## Extension Configuration
