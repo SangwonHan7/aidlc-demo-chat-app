@@ -50,3 +50,17 @@ AI Response: 답변에 모순 없음 확인. components.md, component-methods.md
 Context: Application Design 단계 완료, 사용자 승인 대기 (Gate)
 
 ---
+## Application Design - Approved
+Timestamp: 2026-08-13T08:11:20Z
+User Input: "계속 진행해줘"
+AI Response: application-design.md 승인으로 처리. Units Generation 단계 Part 1(Planning) 진행 시작.
+Context: Application Design 완료/승인, Units Generation 진행
+
+---
+## Units Generation - Answers Received and Generation Complete
+Timestamp: 2026-08-13T08:15:25Z
+User Input: "답변 완료" (unit-of-work-plan.md 답변: Q1=B Backend/Frontend/Infra 3유닛, Q2=A Backend 우선 개발, Q3=A 모노레포)
+AI Response: Q1(3유닛)과 Q3(2폴더 모노레포)간 세부 불일치(Infra 폴더 위치 미명시)는 낮은 위험의 추론으로 해결(infra/ 폴더 추가, 근거를 문서에 명시하고 사용자에게 확인 요청). unit-of-work.md, unit-of-work-dependency.md, unit-of-work-story-map.md 생성.
+Context: Units Generation Part 2(생성) 완료, 사용자 승인 대기 (Gate)
+
+---
