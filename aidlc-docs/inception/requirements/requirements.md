@@ -44,8 +44,8 @@ Out of Scope (MVP, 변경 없음): 파일/이미지 첨부, 메시지 검색, �
   - 프레임워크는 NFR Requirements 단계에서 최종 확정 (백엔드 Java -> jqwik 권장, 프론트엔드 TypeScript -> fast-check 권장, 각각 JUnit5/Vitest와 통합 가능)
 
 ## Open Items Carried Forward (Blocking 아님, 후속 단계에서 결정)
-- NAS 리소스 임계값 및 Docker Compose 축소 기준 -> Infrastructure Design 단계
-- PBT 프레임워크 최종 선택 -> NFR Requirements 단계
+- [해결됨] NAS 리소스 임계값 및 Docker Compose 축소 기준 -> Backend Infrastructure Design에서 해결. 실제 NAS는 Synology DS925+(4코어/8스레드, 현재 20GB 설치됨, 최대 32GB)로 확인됨. 20GB는 최소 권장선(16GB)을 넘어 Docker Compose 없이 바로 k3s로 진행. 상세: construction/backend/infrastructure-design/infrastructure-design.md
+- [해결됨] PBT 프레임워크 최종 선택 -> Backend NFR Requirements에서 jqwik으로 확정. 상세: construction/backend/nfr-requirements/tech-stack-decisions.md
 
 ## Extension Configuration Summary
 | Extension | Enabled | 근거 |

@@ -78,3 +78,58 @@ AI Response: domain-entities.md, business-rules.md, business-logic-model.md 생�
 Context: Backend 유닛 Functional Design 완료, PBT-01 준수, 사용자 승인 대기 (Gate)
 
 ---
+## Backend Functional Design - Approved
+Timestamp: 2026-08-18T02:20:34Z
+User Input: "계속 진행해줘"
+AI Response: Functional Design 승인 처리. NFR Requirements 단계(Backend) 계획+질문 작성 시작.
+Context: Backend Functional Design 완료/승인, NFR Requirements 진행
+
+---
+
+## Backend NFR Requirements - Answers Received and Generation Complete
+Timestamp: 2026-08-18T02:35:00Z
+User Input: "답변 완료" (backend-nfr-requirements-plan.md 답변: Q1=A Spring Data JPA, Q2=A Redis 로그인 잠금 카운터, Q3=B Redis Refresh Token, Q4=A jqwik, Q5=B Actuator+Prometheus)
+AI Response: 답변에 모순 없음 확인. nfr-requirements.md, tech-stack-decisions.md 생성 (PBT-09: jqwik 확정). 참고: 이 단계는 mcp__workspace__bash 환경 장애(VM_DISK_SPACE_INSUFFICIENT)로 Read/Write/Edit 파일 도구로 전환하여 진행.
+Context: Backend NFR Requirements 완료, PBT-09 준수, 사용자 승인 대기 (Gate)
+
+---
+
+## Backend NFR Requirements - Approved
+Timestamp: 2026-08-18T02:45:00Z
+User Input: "답변 완료"
+AI Response: 직전 턴에 새로 제시한 질문이 없었으므로(완료 메시지만 제시) "답변 완료"를 NFR Requirements 승인 의사로 해석하여 처리. NFR Design 단계(Backend) 계획+질문 작성 시작. mcp__workspace__bash 사용 불가 지속(VM_DISK_SPACE_INSUFFICIENT) - Read/Write/Edit로 계속 진행.
+Context: Backend NFR Requirements 완료/승인, NFR Design 진행
+
+---
+
+## Backend NFR Design - Answers Received and Generation Complete
+Timestamp: 2026-08-18T03:05:00Z
+User Input: "답변 완료" (backend-nfr-design-plan.md 답변: Q1=A Kafka 재시도, Q2=B 오토스케일링 미적용, Q3=A 멤버십 Redis 캐싱, Q4=A 메시지 rate limiting, Q5=A Redis 단일 인스턴스)
+AI Response: 답변에 모순 없음 확인. nfr-design-patterns.md, logical-components.md 생성 (Redis 키 구조, Kafka 토픽/재시도, Vault 경로 정의). PBT 관점 추가 속성 2건(Rate Limiter Invariant, 캐시-DB 일관성) 식별.
+Context: Backend NFR Design 완료, 사용자 승인 대기 (Gate)
+
+---
+
+## Backend NFR Design - Approved
+Timestamp: 2026-08-18T03:15:00Z
+User Input: "계속 진행해줘"
+AI Response: NFR Design 승인 처리. Infrastructure Design 단계(Backend) 계획+질문 작성 시작 - requirements.md의 NAS 리소스 임계값 Open Item을 이 단계 질문에 포함.
+Context: Backend NFR Design 완료/승인, Infrastructure Design 진행
+
+---
+
+## Backend Infrastructure Design - Answers Received and Generation Complete
+Timestamp: 2026-08-18T03:35:00Z
+User Input: "답변 완료" (backend-infrastructure-design-plan.md 답변: Q1=A k3s, Q2=D "Synology DS925+ 사용중", Q3=A PostgreSQL, Q4=A nginx-ingress, Q5=A Grafana 포함, Q6=B 네임스페이스 분리)
+AI Response: Q2에서 사용자가 실제 NAS 모델(Synology DS925+)을 제시하여 WebSearch로 실제 사양(AMD Ryzen V1500B 4코어/8스레드, 기본 4GB/최대 32GB DDR4 ECC) 및 Synology에서 k3s 구동 방식(Virtual Machine Manager로 Ubuntu VM 생성 후 내부에 k3s 설치)을 조회. 이를 바탕으로 requirements.md의 NAS 리소스 임계값 Open Item을 구체적 수치로 해결(4GB=Docker Compose, 16GB 이상=k3s 권장). infrastructure-design.md, deployment-architecture.md, shared-infrastructure.md 생성. requirements.md Open Items 섹션도 해결됨으로 갱신.
+Context: Backend Infrastructure Design 완료, 사용자 승인 대기 (Gate)
+
+---
+
+## Backend Infrastructure Design - RAM 수치 정정
+Timestamp: 2026-08-18T03:40:00Z
+User Input: "ds925+ 램은 20gb야 문서 수정해줘"
+AI Response: 사용자가 실제 설치된 RAM이 기본 4GB가 아닌 20GB임을 확인해줌 (4GB 기본 모듈 + 16GB 모듈 추가 구성으로 추정, 2 슬롯 사양과 일치). infrastructure-design.md, deployment-architecture.md, shared-infrastructure.md, requirements.md의 RAM 임계값 표와 권장 구성을 20GB 기준으로 갱신 - 최소 권장선(16GB) 이상이므로 Docker Compose 축소 없이 k3s로 바로 진행, VM에 14~16GB 할당 권장으로 수정.
+Context: Backend Infrastructure Design 문서 정정, 사용자 승인 대기 (Gate) 유지
+
+---
