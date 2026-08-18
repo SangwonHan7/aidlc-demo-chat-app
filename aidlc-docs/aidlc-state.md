@@ -4,7 +4,7 @@
 - Project Name: QuickChat (AI-DLC 데모, 1회차 멘토링용)
 - Project Type: Greenfield
 - Start Date: 2026-08-13T06:36:01Z
-- Current Stage: INCEPTION - Units Generation (완료, 승인 대기)
+- Current Stage: CONSTRUCTION - Backend Unit - Functional Design (완료, 승인 대기)
 
 ## Workspace State
 - Existing Code: No
@@ -34,3 +34,20 @@
 
 ## Session Scope Note
 사용자가 이번 세션은 Requirements Analysis까지만 진행하기로 결정 (Q4=A). 승인 후 자동으로 다음 단계로 진행하지 않고 대기.
+
+### CONSTRUCTION PHASE - Backend Unit
+- [x] Functional Design (완료, PBT-01 9개 속성 식별, 승인 대기)
+- [ ] NFR Requirements
+- [ ] NFR Design
+- [ ] Infrastructure Design
+- [ ] Code Generation
+
+### CONSTRUCTION PHASE - Frontend Unit
+- [ ] Functional Design
+- [ ] NFR Requirements
+- [ ] NFR Design
+- [ ] Infrastructure Design
+- [ ] Code Generation
+
+### CONSTRUCTION PHASE - Build and Test
+- [ ] Build and Test (모든 유닛 완료 후)

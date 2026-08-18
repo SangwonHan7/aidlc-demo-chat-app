@@ -64,3 +64,17 @@ AI Response: Q1(3유닛)과 Q3(2폴더 모노레포)간 세부 불일치(Infra �
 Context: Units Generation Part 2(생성) 완료, 사용자 승인 대기 (Gate)
 
 ---
+## Units Generation - Approved / Construction Phase Started
+Timestamp: 2026-08-13T08:18:30Z
+User Input: "계속 진행해줘"
+AI Response: unit-of-work.md 승인으로 처리, Inception 단계 종료. Construction 단계 시작 - Backend 유닛 Functional Design Plan 작성 (Infra 유닛은 별도 Functional Design 없이 Backend/Frontend의 Infrastructure Design+Code Generation 산출물로 구현되며 infra/ 폴더에 배치됨을 명시).
+Context: INCEPTION 완료, CONSTRUCTION 진입 - Backend 유닛 Functional Design Part 1
+
+---
+## Backend Functional Design - Answers Received and Generation Complete
+Timestamp: 2026-08-18T01:02:04Z
+User Input: "답변 완료" (backend-functional-design-plan.md 답변: Q1=A DM/Channel 통합모델, Q2=A 채널명 중복허용, Q3=B OWNER 이탈시 ARCHIVED, Q4=A 중복초대/참여시 에러, Q5=A cursor 페이지네이션)
+AI Response: domain-entities.md, business-rules.md, business-logic-model.md 생성. PBT-01(Testable Properties) 9개 속성 식별 및 문서화 (Round-trip/Invariant/Idempotence), Oracle/Commutativity/Induction/Easy-verification은 해당 없음으로 명시.
+Context: Backend 유닛 Functional Design 완료, PBT-01 준수, 사용자 승인 대기 (Gate)
+
+---
