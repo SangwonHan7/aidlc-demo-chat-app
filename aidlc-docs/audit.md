@@ -133,3 +133,19 @@ AI Response: 사용자가 실제 설치된 RAM이 기본 4GB가 아닌 20GB임�
 Context: Backend Infrastructure Design 문서 정정, 사용자 승인 대기 (Gate) 유지
 
 ---
+
+## Backend Infrastructure Design - Approved / Code Generation Plan Created
+Timestamp: 2026-08-18T03:50:00Z
+User Input: "계속 진행해줘"
+AI Response: Infrastructure Design(RAM 20GB 정정 포함) 승인 처리. Code Generation 단계(Backend) Part 1 - 13단계 계획 작성(Project Structure, Business Logic x3, API Layer x3, Repository Layer x3, DB Migration, Documentation, Deployment Artifacts). K8s 매니페스트 전체는 Frontend 코드 생성 이후로 범위 조정.
+Context: Backend Infrastructure Design 완료/승인, Code Generation Part 1(Planning) 완료, 전체 계획 승인 대기 (Gate)
+
+---
+
+## Backend Code Generation - Plan Approved / Part 2(Generation) 완료
+Timestamp: 2026-08-18T09:00:00Z
+User Input: "계속 해줘"
+AI Response: Code Generation 13단계 계획 승인 처리. Part 2(Generation) 전체 13단계 실행: (1) build.gradle/settings.gradle/application.yml/Dockerfile, (2)-(3) 도메인 엔티티 4종 + 서비스 6종 + 예외 9종 및 단위/속성 테스트(jqwik 11개 속성 + example-based), (4) business-logic-summary.md, (5)-(6) 컨트롤러 4종 + DTO 12종 + Security(JWT) + WebSocket(STOMP) 및 AuthControllerTest, (7) api-layer-summary.md, (8)-(9) JPA Repository 4종 + Redis 서비스 5종 + Kafka Publisher/Consumer 및 관련 단위/속성 테스트, (10) repository-layer-summary.md, (11) Flyway V1__init_schema.sql, (12) backend/README.md + springdoc-openapi, (13) Dockerfile 보완 + docker-compose.yml에 backend 서비스 반영. 진행 중 발견한 설계 불일치 2건(failedLoginCount, RefreshToken이 JPA 엔티티로 잘못 생성됨)을 NFR Requirements 결정에 맞게 Redis 기반으로 수정, 엔티티 ID를 @GeneratedValue 대신 생성자 내 클라이언트 측 UUID 할당으로 수정(테스트 용이성), Redis pub/sub 직렬화를 수동 문자열 조합에서 Jackson JSON으로 수정. mcp__workspace__bash 미복구로 전 과정 Read/Write/Edit 파일 도구로 진행하여 실제 컴파일/빌드 검증은 수행하지 못함 - Kafka 통합 테스트, Flyway 실행 검증, WebSocket 인증 통합 테스트와 함께 Build and Test 단계로 명시적으로 이동(각 summary.md에 문서화). backend-code-generation-plan.md 13단계 체크박스 전체 완료 처리, aidlc-state.md 갱신.
+Context: Backend 유닛 Code Generation(Part 1+Part 2) 완료, 사용자 승인 대기 (Gate) - 승인 시 Frontend 유닛 Functional Design으로 진행
+
+---
