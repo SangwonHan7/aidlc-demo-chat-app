@@ -189,3 +189,35 @@ AI Response: frontend-components.md(화면/라우트, 컴포넌트 계층, Zusta
 Context: Frontend 유닛 Functional Design 완료, 사용자 승인 대기 (Gate)
 
 ---
+
+## Frontend Functional Design - Approved
+Timestamp: 2026-08-18T10:05:00Z
+User Input: "계속 진행해줘"
+AI Response: Functional Design(Contradiction 1, Gap 2 해결 포함) 승인 처리. NFR Requirements 단계(Frontend) 계획+질문 작성 시작 - Tech Stack Selection(렌더링 전략, PBT 프레임워크, 스타일링, HTTP/WS 클라이언트), Performance, Reliability, Usability 카테고리 평가. Replica 수 등 배포 관련 결정은 Backend와 동일하게 NFR Design 단계로 위임.
+Context: Frontend Functional Design 완료/승인, NFR Requirements 진행
+
+---
+
+## Frontend NFR Requirements - Answers Received and Generation Complete
+Timestamp: 2026-08-18T10:15:00Z
+User Input: "답변 완료" (frontend-nfr-requirements-plan.md 답변: Q1=A App Router 전체 클라이언트 컴포넌트, Q2=A fast-check, Q3=A 실습 데모 수준 성능 목표, Q4=A 콘솔+Error Boundary만, Q5=A Tailwind CSS, Q6=B axios+@stomp/stompjs, Q7=A 데스크톱 우선/최소 키보드 네비게이션)
+AI Response: 7개 답변 모두 상호 모순 없음 확인 (Q3/Q4/Q7이 일관되게 "실습 데모 범위" 최소화 방향과 부합). nfr-requirements.md, tech-stack-decisions.md 생성 (PBT-09 상당: fast-check 확정). Q4(별도 모니터링 도구 없음)와 상충하지 않는 범위에서 k8s probe용 최소 `/api/health` 엔드포인트 필요성을 tech-stack-decisions.md에 명시(실제 probe 설정은 Infrastructure Design으로 위임) - Backend의 Presence Gap과 같은 종류의 누락을 사전에 방지하기 위한 조치.
+Context: Frontend NFR Requirements 완료, 사용자 승인 대기 (Gate)
+
+---
+
+## Frontend NFR Requirements - Approved
+Timestamp: 2026-08-18T10:20:00Z
+User Input: "계속 해줘"
+AI Response: NFR Requirements 승인 처리. NFR Design 단계(Frontend) 계획+질문 작성 시작 - Resilience/Scalability/Performance/Security/Logical Components 5개 카테고리 평가. 검토 중 Backend WebSocketConfig(`setAllowedOriginPatterns("*")`)와 SecurityConfig(CORS 미설정)가 서로 맞지 않는 상태를 발견해 질문에 포함(동일 origin 배포 vs CORS 설정).
+Context: Frontend NFR Requirements 완료/승인, NFR Design 진행
+
+---
+
+## Frontend NFR Design - Answers Received, Generation Complete, Post-Approval Patch 2
+Timestamp: 2026-08-18T10:30:00Z
+User Input: "답변 완료" (frontend-nfr-design-plan.md 답변: Q1=B 자동 재시도 없음, Q2=A 고정 레플리카, Q3=A react-window 가상화, Q4=B 다른 origin+CORS, Q5=A Next.js 기본 캐싱)
+AI Response: 5개 답변 모두 상호 모순 없음 확인. nfr-design-patterns.md, logical-components.md 생성. Q4=B에 따라 이미 승인된 Backend 코드에 실제 패치 적용 - SecurityConfig에 CorsConfigurationSource 빈 추가(허용 origin/메서드/헤더 명시, credentials 미허용), SecurityFilterChain에 .cors() 적용, application.yml에 quickchat.cors.allowed-origin(CORS_ALLOWED_ORIGIN) 프로퍼티 추가. api-layer-summary.md에 "Post-Approval Patch 2", backend/README.md 환경변수 표, backend-code-generation-plan.md에도 반영.
+Context: Frontend NFR Design 완료, 사용자 승인 대기 (Gate)
+
+---

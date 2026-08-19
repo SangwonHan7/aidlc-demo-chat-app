@@ -72,5 +72,8 @@
 ## Post-Approval Patch (2026-08-18)
 Frontend Functional Design 진행 중 발견된 Gap(Story 1.4 Presence API 미연결)을 사용자 승인 하에 보완 - PresenceController/PresenceStatusResponse 추가, StompAuthChannelInterceptor에 markOnline/markOffline 연동, PresenceControllerTest 추가. 상세는 api-layer-summary.md의 "Post-Approval Patch" 섹션과 audit.md 참고.
 
+## Post-Approval Patch 2 (2026-08-18)
+Frontend NFR Design(다른 origin 배포 결정)에 따라 SecurityConfig에 CORS 설정 추가, application.yml에 quickchat.cors.allowed-origin 추가. 상세는 api-layer-summary.md의 "Post-Approval Patch 2" 섹션과 audit.md 참고.
+
 ## 실행 방식
 Part 2(Generation)에서 위 13단계를 순서대로 실행하며, 각 단계 완료 시 체크박스를 [x]로 표시하고 aidlc-state.md를 갱신합니다.

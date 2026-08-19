@@ -30,6 +30,9 @@ spring:
         retry.backoff.ms: 200
 
 quickchat:
+  cors:
+    # Frontend가 Backend와 다른 origin에 배포되므로 명시적으로 허용 (frontend-nfr-design-plan.md Q4=B).
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:3000}
   jwt:
     secret: ${JWT_SECRET:}
     access-token-ttl-minutes: 15

@@ -18,6 +18,7 @@ Spring Boot 3 기반 백엔드. 상세 설계는 `../aidlc-docs/construction/bac
 | REDIS_HOST / REDIS_PORT | Redis 접속 정보 | localhost / 6379 |
 | KAFKA_BOOTSTRAP_SERVERS | Kafka 브로커 주소 | localhost:9092 |
 | JWT_SECRET | JWT 서명 키 (HS256, 32바이트 이상) | (없음, Vault에서 주입 필수) |
+| CORS_ALLOWED_ORIGIN | Frontend가 배포된 origin (다른 origin이므로 CORS 허용 필요) | http://localhost:3000 |
 
 ## API 개요
 
