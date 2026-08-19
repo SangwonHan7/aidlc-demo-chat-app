@@ -149,3 +149,43 @@ AI Response: Code Generation 13단계 계획 승인 처리. Part 2(Generation) �
 Context: Backend 유닛 Code Generation(Part 1+Part 2) 완료, 사용자 승인 대기 (Gate) - 승인 시 Frontend 유닛 Functional Design으로 진행
 
 ---
+
+## Backend Code Generation - Approved / Frontend Unit Construction 시작
+Timestamp: 2026-08-18T09:10:00Z
+User Input: "다음 단계 진행해줘"
+AI Response: Backend Code Generation 승인 처리 - Backend 유닛의 Construction 전 단계(Functional Design/NFR Requirements/NFR Design/Infrastructure Design/Code Generation) 완료. unit-of-work.md 개발 순서(Backend -> Frontend -> Infra 마무리)에 따라 Frontend 유닛 Functional Design 단계 시작. unit-of-work.md, unit-of-work-story-map.md, stories.md, tech-env.md 재확인 후 frontend-functional-design-plan.md(계획 4항목 + 질문 7개: 화면 레이아웃, Zustand 스토어 분리, 토큰 저장/재발급, WebSocket 연결 생명주기, 재연결 처리, 클라이언트 검증 범위, 에러 표시 방식) 작성.
+Context: Backend Construction 완료/승인, Frontend 유닛 Functional Design Part 1(계획+질문) 진행, 사용자 답변 대기 (Gate)
+
+---
+
+## Frontend Functional Design - Answers Received, Contradiction Detected
+Timestamp: 2026-08-18T09:20:00Z
+User Input: "답변 완료" (frontend-functional-design-plan.md 답변: Q1=A Slack형 앱쉘, Q2=B 도메인별 스토어 분리, Q3=A Refresh Token httpOnly 쿠키, Q4=A 전역 연결 유지, Q5=A 자동 재연결+REST 재조회, Q6=B 추가 UX 검증 포함, Q7=A 공통 토스트)
+AI Response: 6개 답변(Q1,Q2,Q4,Q5,Q6,Q7)은 모순 없음. Q3(Refresh Token httpOnly 쿠키)은 이미 승인된 Backend 구현(AuthController/TokenResponse가 accessToken+refreshToken을 JSON 본문으로 반환, Set-Cookie 로직 없음, CSRF 비활성화)과 모순됨을 발견 - 브라우저 JS는 httpOnly 쿠키를 직접 생성할 수 없어 Frontend만으로는 구현 불가능. frontend-functional-design-clarification-questions.md 생성 (Backend 계약 유지+localStorage / Backend 계약 유지+메모리만 / Backend 코드 수정 3가지 선택지 제시).
+Context: Frontend Functional Design Part 1, 모순 해결 대기 (Gate) - question-format-guide.md의 Contradiction Detection 절차 적용
+
+---
+
+## Frontend Functional Design - Contradiction 1 해결 / Gap 2 발견
+Timestamp: 2026-08-18T09:30:00Z
+User Input: "답변 완료" (frontend-functional-design-clarification-questions.md Clarification Question 1 답변: A - 현재 Backend 계약 유지 + localStorage에 Access/Refresh Token 저장, Backend 수정 없음)
+AI Response: Contradiction 1 해결 완료 - Q3 실제 구현 방향을 "로컬스토리지 저장"으로 확정. 이어서 Frontend 화면 설계를 위해 Backend 코드를 재검토하는 과정에서 두 번째 이슈 발견: unit-of-work-story-map.md는 Story 1.4(온라인 상태 확인)에 대해 Backend가 "Presence API"를 제공한다고 되어 있으나, 실제 코드에는 PresenceService/PresenceRedisService만 존재하고 이를 호출하는 REST 컨트롤러나 WebSocket 연결/해제 이벤트 리스너가 전혀 없어 온라인 상태를 표시할 방법이 없음(grep으로 PresenceService 참조 지점이 자기 자신과 PresenceRedisService 뿐임을 확인). frontend-functional-design-clarification-questions.md에 Gap 2로 추가하여 (A) Backend 소규모 보완 (B) Story 1.4 범위 제외 중 선택하도록 요청.
+Context: Frontend Functional Design Part 1, Gap 2 해결 대기 (Gate) - error-handling.md "Missing dependencies from prior stages"(High severity) 절차 적용
+
+---
+
+## Backend Code Generation - Post-Approval Patch (Gap 2 해결)
+Timestamp: 2026-08-18T09:40:00Z
+User Input: "답변 완료" (frontend-functional-design-clarification-questions.md Clarification Question 2 답변: A - Backend에 최소 기능 추가)
+AI Response: 이미 승인된 Backend Code Generation 산출물에 소규모 보완 적용 - (1) StompAuthChannelInterceptor가 STOMP CONNECT 인증 성공 시 PresenceService.markOnline, DISCONNECT 시 markOffline을 호출하도록 확장(Spring이 CONNECT 때 설정한 Principal을 세션에 보관해 DISCONNECT 프레임에서도 accessor.getUser()로 동일 사용자 식별 가능), (2) PresenceController(`GET /api/presence?userIds=`) + PresenceStatusResponse DTO 신규 추가, (3) PresenceControllerTest(MockMvc, AuthControllerTest와 동일 패턴) 추가. PresenceService/PresenceRedisService 자체는 변경 없음. 알려진 제약(presence Redis 키 TTL 2분에 대한 하트비트 갱신 로직 없음, WebSocket 연동 부분은 단위 테스트 미포함)을 api-layer-summary.md Post-Approval Patch 섹션에 투명하게 기록. backend/README.md API 개요, backend-code-generation-plan.md에도 패치 반영.
+Context: Backend 유닛에 대한 소규모 재작업 완료 (기존 승인 범위 내 보완), Frontend Functional Design Part 1의 모든 모순/gap 해결 완료 - Functional Design 아티팩트 생성 진행
+
+---
+
+## Frontend Functional Design - Generation Complete
+Timestamp: 2026-08-18T09:55:00Z
+User Input: N/A (Contradiction 1 / Gap 2 해결 답변을 바탕으로 계속 진행)
+AI Response: frontend-components.md(화면/라우트, 컴포넌트 계층, Zustand 스토어 3종, 컴포넌트별 API/WS 연동 지점, 결정사항 요약표), domain-entities.md(Backend DTO 미러링 TypeScript 타입 + 스토어 상태 형태), business-rules.md(토큰 저장, 클라이언트 검증, WebSocket 연결/재연결 정책, presence polling 정책, 에러 표시, 낙관적 업데이트 미적용 결정), business-logic-model.md(화면별 7개 워크플로우 + PBT-01 관점 7개 Testable Properties, 프레임워크 선택은 NFR Requirements로 위임) 생성. frontend-functional-design-plan.md 체크박스 전체 완료 처리.
+Context: Frontend 유닛 Functional Design 완료, 사용자 승인 대기 (Gate)
+
+---

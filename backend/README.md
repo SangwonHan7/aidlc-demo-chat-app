@@ -25,7 +25,9 @@ Spring Boot 3 기반 백엔드. 상세 설계는 `../aidlc-docs/construction/bac
 - `POST /api/channels`, `GET /api/channels`, `POST /api/channels/direct` - 채널 생성/조회/DM (FR-3, FR-4)
 - `POST /api/channels/{id}/join`, `POST /api/channels/{id}/members`, `DELETE /api/channels/{id}/members/{userId}` - 참여/초대/제외
 - `GET /api/channels/{id}/messages?before=&size=` - 메시지 이력 (cursor 기반, FR-7)
+- `GET /api/presence?userIds=` - 온라인 상태 조회, UUID 목록 파라미터 (FR-6, story 1.4)
 - WebSocket(STOMP) `/ws` 엔드포인트, `/app/chat.send/{channelId}`로 전송, `/topic/channel/{channelId}` 구독 (FR-2, FR-5)
+  - CONNECT 인증 성공 시 서버가 자동으로 해당 세션을 온라인으로 표시하고, DISCONNECT 시 오프라인으로 표시 (별도 클라이언트 API 호출 불필요)
 - API 문서: `/swagger-ui.html` (springdoc-openapi)
 - 헬스체크/메트릭: `/actuator/health`, `/actuator/prometheus`
 

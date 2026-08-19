@@ -4,7 +4,7 @@
 - Project Name: QuickChat (AI-DLC 데모, 1회차 멘토링용)
 - Project Type: Greenfield
 - Start Date: 2026-08-13T06:36:01Z
-- Current Stage: CONSTRUCTION - Backend Unit - Code Generation 완료(승인 대기), 다음은 Frontend Unit
+- Current Stage: CONSTRUCTION - Frontend Unit - Functional Design 완료, 사용자 승인 대기
 
 ## Workspace State
 - Existing Code: No
@@ -40,10 +40,10 @@
 - [x] NFR Requirements (완료: JPA, Redis 잠금카운터/RefreshToken, jqwik, Actuator+Prometheus, 승인 완료)
 - [x] NFR Design (완료: Redis 캐싱/rate-limit, Kafka 재시도, 고정 레플리카, 승인 완료)
 - [x] Infrastructure Design (완료: k3s on Synology DS925+ VMM(실제 RAM 20GB 확인, VM 14~16GB 할당), PostgreSQL/nginx-ingress/Grafana 확정, 승인 완료)
-- [x] Code Generation (Part 1 계획 13단계 + Part 2 실행 완료: 엔티티/서비스/API/Repository/Redis/Kafka/보안/WebSocket/테스트/마이그레이션/README/Dockerfile/docker-compose, 승인 대기)
+- [x] Code Generation (Part 1 계획 13단계 + Part 2 실행 완료: 엔티티/서비스/API/Repository/Redis/Kafka/보안/WebSocket/테스트/마이그레이션/README/Dockerfile/docker-compose, 승인 완료)
 
 ### CONSTRUCTION PHASE - Frontend Unit
-- [ ] Functional Design
+- [x] Functional Design (완료: frontend-components.md/domain-entities.md/business-rules.md/business-logic-model.md, Contradiction 1+Gap 2 해결 포함, 승인 대기)
 - [ ] NFR Requirements
 - [ ] NFR Design
 - [ ] Infrastructure Design

@@ -69,5 +69,8 @@
 ## Part 2 완료
 전체 13단계 실행 완료 (2026-08-18). 상세 결과는 각 Summary 문서(business-logic-summary.md, api-layer-summary.md, repository-layer-summary.md) 참고. 알려진 제약(Kafka 통합 테스트, Flyway 실행 검증, WebSocket 인증 통합 테스트)은 Build and Test 단계로 이동.
 
+## Post-Approval Patch (2026-08-18)
+Frontend Functional Design 진행 중 발견된 Gap(Story 1.4 Presence API 미연결)을 사용자 승인 하에 보완 - PresenceController/PresenceStatusResponse 추가, StompAuthChannelInterceptor에 markOnline/markOffline 연동, PresenceControllerTest 추가. 상세는 api-layer-summary.md의 "Post-Approval Patch" 섹션과 audit.md 참고.
+
 ## 실행 방식
 Part 2(Generation)에서 위 13단계를 순서대로 실행하며, 각 단계 완료 시 체크박스를 [x]로 표시하고 aidlc-state.md를 갱신합니다.
