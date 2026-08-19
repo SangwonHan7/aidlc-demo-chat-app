@@ -1,7 +1,7 @@
 # Deployment Architecture - Backend Unit
 
 ## 배포 단위
-- Backend: Deployment(1 replica) + Service(ClusterIP) - backend/ 폴더에서 이미지 빌드
+- Backend: Deployment(1 replica) + Service(~~ClusterIP~~ → **NodePort 30081 → containerPort 8080**, 2026-08-18 정정 - Frontend NFR Design Q4=B에 따라 Backend/Frontend가 다른 origin으로 배포되며 nginx-ingress 경로 라우팅을 사용하지 않기로 함. 상세는 `aidlc-docs/construction/frontend/infrastructure-design/`, 본 문서의 "RAM 임계값" 하단 참고) - backend/ 폴더에서 이미지 빌드
 - PostgreSQL, Kafka, Redis, Vault: StatefulSet + PVC(Synology CSI) - infra/ 폴더의 매니페스트로 관리, quickchat-data 네임스페이스
 - nginx-ingress, Prometheus, Grafana: 클러스터 공용 인프라 - infra/ 폴더 (shared-infrastructure.md 참고)
 

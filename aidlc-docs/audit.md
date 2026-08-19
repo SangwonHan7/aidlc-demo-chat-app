@@ -221,3 +221,19 @@ AI Response: 5개 답변 모두 상호 모순 없음 확인. nfr-design-patterns
 Context: Frontend NFR Design 완료, 사용자 승인 대기 (Gate)
 
 ---
+
+## Frontend NFR Design - Approved
+Timestamp: 2026-08-18T10:40:00Z
+User Input: "계속 진행해줘"
+AI Response: NFR Design 승인 처리. Infrastructure Design 단계(Frontend) 계획+질문 작성 시작. Backend의 shared-infrastructure.md/deployment-architecture.md 재검토 중 Backend Infrastructure Design이 "경로 기반 단일 호스트(같은 origin)" 라우팅을 가정하고 쓰여 있어 Frontend NFR Design Q4(다른 origin+CORS) 결정과 맞지 않음을 발견 - 질문에 실제 호스트명 전략을 포함해 답변 반영 후 Backend 쪽 문서도 host 기반 라우팅으로 일치시킬 계획.
+Context: Frontend NFR Design 완료/승인, Infrastructure Design 진행
+
+---
+
+## Frontend Infrastructure Design - Answers Received, Generation Complete, Backend 문서 정정
+Timestamp: 2026-08-18T10:55:00Z
+User Input: "답변 완료" (frontend-infrastructure-design-plan.md 답변: Q1=A Next.js Node 서버 컨테이너, Q2=B 같은 호스트+다른 포트)
+AI Response: 2개 답변 모순 없음 확인. infrastructure-design.md, deployment-architecture.md(Frontend) 생성 - 고정 1레플리카(256Mi/512Mi), NodePort 30080(Frontend)/30081(Backend)로 포트 구분, k8s NodePort 범위(30000-32767) 제약을 반영해 예시 포트(3000/8080)를 컨테이너 내부 포트로 유지하고 외부 노출 포트만 조정. 이 결정에 따라 Backend의 infrastructure-design.md/deployment-architecture.md(경로 기반 단일 host 가정) 및 shared-infrastructure.md를 NodePort+포트 구분 방식으로 함께 정정, TLS 종료 지점 소실을 알려진 제약으로 명시(데모 범위에서 평문 HTTP로 단순화).
+Context: Frontend Infrastructure Design 완료, 사용자 승인 대기 (Gate)
+
+---

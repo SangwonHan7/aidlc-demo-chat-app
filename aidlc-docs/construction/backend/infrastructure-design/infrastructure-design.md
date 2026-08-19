@@ -35,10 +35,11 @@
 ## 시크릿
 - Vault, quickchat-data 네임스페이스, request 128Mi/0.1 vCPU, limit 256Mi/0.25 vCPU
 
-## 네트워킹
-- Ingress Controller: nginx-ingress (Q4 답변 A), TLS 종료
-- Backend: ClusterIP + Ingress 경로(/api, /ws)
-- Frontend: ClusterIP + Ingress 경로(/)
+## 네트워킹 (2026-08-18 정정 - Frontend Infrastructure Design 참고)
+- Ingress Controller: nginx-ingress (Q4 답변 A)는 클러스터에 계속 유지하지만, Backend/Frontend 두 origin의 실제 라우팅에는 사용하지 않기로 정정됨 (Frontend NFR Design Question 4=B: 다른 origin 배포 결정에 따름)
+- ~~Backend: ClusterIP + Ingress 경로(/api, /ws)~~ → **Backend: Service(NodePort 30081 → containerPort 8080)**로 변경. `SecurityConfig`에 CORS 설정 추가로 대응 (`aidlc-docs/construction/backend/code/api-layer-summary.md`의 "Post-Approval Patch 2" 참고)
+- ~~Frontend: ClusterIP + Ingress 경로(/)~~ → **Frontend: Service(NodePort 30080 → containerPort 3000)**로 변경 (`aidlc-docs/construction/frontend/infrastructure-design/`  참고)
+- TLS 종료 지점이 사라짐에 따른 제약: 1회차 멘토링 데모(내부 LAN) 범위에서는 평문 HTTP로 단순화, TLS는 범위 밖으로 명시. 상세 근거는 `aidlc-docs/construction/frontend/infrastructure-design/infrastructure-design.md`의 "알려진 제약" 참고
 
 ## 모니터링
 - Prometheus + Grafana 기본 대시보드 포함 (Q5 답변 A)
