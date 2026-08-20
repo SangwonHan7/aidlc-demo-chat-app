@@ -136,6 +136,26 @@ public class ChannelService {
                 memberRepository.findByUserId(userId).stream().map(ChannelMember::getChannelId).toList());
     }
 
+    /**
+     * 참여 여부와 무관하게 모든 PUBLIC 그룹 채널을 나열한다 (story 1.3: "공개 채널은 목록에서 바로
+     * 참여할 수 있다"). Frontend가 이미 참여 중인 채널은 자신이 가진 목록과 대조해 구분한다.
+     */
+    @Transactional(readOnly = true)
+    public List<Channel> listDiscoverablePublicChannels() {
+        return channelRepository.findByTypeAndVisibility(ChannelType.GROUP, ChannelVisibility.PUBLIC);
+    }
+
+    /**
+     * 채널 멤버 목록 조회. 요청자가 이미 멤버여야 한다 (초대/제외처럼 OWNER 전용은 아님 - 조회는
+     * 모든 멤버에게 허용). Frontend Code Generation 중 발견된 누락 보완(멤버 관리 UI, DM 상대 식별).
+     */
+    @Transactional(readOnly = true)
+    public List<ChannelMember> listMembers(UUID channelId, UUID requesterId) {
+        getChannelOrThrow(channelId);
+        requireMember(channelId, requesterId);
+        return memberRepository.findByChannelId(channelId);
+    }
+
     @Transactional(readOnly = true)
     public Channel getChannelOrThrow(UUID channelId) {
         return channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new);

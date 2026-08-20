@@ -4,7 +4,7 @@
 - Project Name: QuickChat (AI-DLC 데모, 1회차 멘토링용)
 - Project Type: Greenfield
 - Start Date: 2026-08-13T06:36:01Z
-- Current Stage: CONSTRUCTION - Frontend Unit - Infrastructure Design 완료, 사용자 승인 대기
+- Current Stage: CONSTRUCTION - Frontend Unit - Code Generation 완료, 사용자 승인 대기 (Gate)
 
 ## Workspace State
 - Existing Code: No
@@ -46,8 +46,15 @@
 - [x] Functional Design (완료: frontend-components.md/domain-entities.md/business-rules.md/business-logic-model.md, Contradiction 1+Gap 2 해결 포함, 승인 완료)
 - [x] NFR Requirements (완료: App Router CSR, fast-check, Tailwind, axios+stompjs, 데스크톱 우선, 승인 완료)
 - [x] NFR Design (완료: 재시도 없음/고정 레플리카/react-window 가상화/CORS(Backend 패치 포함)/Next.js 기본 캐싱, 승인 완료)
-- [x] Infrastructure Design (완료: Next.js Node 서버, NodePort 30080/30081 포트 구분, Backend 문서 정정 포함, 승인 대기)
-- [ ] Code Generation
+- [x] Infrastructure Design (완료: Next.js Node 서버, NodePort 30080/30081 포트 구분, Backend 문서 정정 포함, 승인 완료)
+- [x] Code Generation (Part 1 계획 승인 완료. Part 2 Step1~11 전체 완료: 프로젝트구조/비즈니스로직+테스트/컴포넌트+페이지/컴포넌트테스트/README/Dockerfile+docker-compose. Backend Post-Approval Patch 4(GET /api/users/me) 및 Frontend Dockerfile의 NEXT_PUBLIC_* build-arg 정정 포함. 승인 대기)
+
+### CONSTRUCTION PHASE - Backend Unit (Post-Approval Patches, Frontend 작업 중 발견)
+- Patch 1: Presence API (`GET /api/presence`, WS CONNECT/DISCONNECT 연동)
+- Patch 2: CORS (`SecurityConfig` CorsConfigurationSource, `CORS_ALLOWED_ORIGIN`)
+- Patch 3: 채널 멤버 목록/사용자 조회·검색/공개 채널 발견 API (`GET /api/channels/{id}/members`, `GET /api/users`, `GET /api/users/search`, `GET /api/channels/discoverable`)
+- Patch 4: 내 프로필 조회 API (`GET /api/users/me`)
+- 상세: `aidlc-docs/construction/backend/code/api-layer-summary.md`
 
 ### CONSTRUCTION PHASE - Build and Test
 - [ ] Build and Test (모든 유닛 완료 후)

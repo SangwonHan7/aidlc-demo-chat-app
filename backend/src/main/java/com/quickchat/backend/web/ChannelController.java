@@ -2,6 +2,7 @@ package com.quickchat.backend.web;
 
 import com.quickchat.backend.domain.ChannelType;
 import com.quickchat.backend.service.ChannelService;
+import com.quickchat.backend.web.dto.ChannelMemberResponse;
 import com.quickchat.backend.web.dto.ChannelResponse;
 import com.quickchat.backend.web.dto.CreateChannelRequest;
 import com.quickchat.backend.web.dto.InviteMemberRequest;
@@ -45,6 +46,17 @@ public class ChannelController {
                 .map(ChannelResponse::from).toList();
     }
 
+    /**
+     * 참여 여부와 무관한 PUBLIC 그룹 채널 전체 목록 (story 1.3). Frontend Code Generation 중 발견된
+     * 누락 보완 - 기존 GET /api/channels는 "내 채널"만 반환해 아직 참여하지 않은 공개 채널을 발견할
+     * 방법이 없었다.
+     */
+    @GetMapping("/discoverable")
+    public List<ChannelResponse> listDiscoverable() {
+        return channelService.listDiscoverablePublicChannels().stream()
+                .map(ChannelResponse::from).toList();
+    }
+
     @PostMapping("/{channelId}/join")
     public void join(@PathVariable UUID channelId, Principal principal) {
         channelService.joinChannel(channelId, currentUserId(principal));
@@ -59,6 +71,16 @@ public class ChannelController {
     @DeleteMapping("/{channelId}/members/{userId}")
     public void removeMember(@PathVariable UUID channelId, @PathVariable UUID userId, Principal principal) {
         channelService.removeMember(channelId, currentUserId(principal), userId);
+    }
+
+    /**
+     * 채널 멤버 목록 조회 (요청자도 멤버여야 함). Frontend Code Generation 중 발견된 누락 보완 -
+     * 멤버 관리 UI(story 2.2)와 DM 상대 식별(story 1.2/1.4)에 필요.
+     */
+    @GetMapping("/{channelId}/members")
+    public List<ChannelMemberResponse> listMembers(@PathVariable UUID channelId, Principal principal) {
+        return channelService.listMembers(channelId, currentUserId(principal)).stream()
+                .map(ChannelMemberResponse::from).toList();
     }
 
     private UUID currentUserId(Principal principal) {

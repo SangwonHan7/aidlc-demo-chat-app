@@ -23,9 +23,14 @@ Spring Boot 3 기반 백엔드. 상세 설계는 `../aidlc-docs/construction/bac
 ## API 개요
 
 - `POST /api/auth/register`, `/api/auth/login`, `/api/auth/refresh` - 인증 (FR-1)
-- `POST /api/channels`, `GET /api/channels`, `POST /api/channels/direct` - 채널 생성/조회/DM (FR-3, FR-4)
+- `POST /api/channels`, `GET /api/channels`, `POST /api/channels/direct` - 채널 생성/내 채널 조회/DM (FR-3, FR-4)
+- `GET /api/channels/discoverable` - 참여 여부와 무관한 PUBLIC 채널 전체 목록 (story 1.3)
 - `POST /api/channels/{id}/join`, `POST /api/channels/{id}/members`, `DELETE /api/channels/{id}/members/{userId}` - 참여/초대/제외
 - `GET /api/channels/{id}/messages?before=&size=` - 메시지 이력 (cursor 기반, FR-7)
+- `GET /api/channels/{id}/members` - 채널 멤버 목록(userId, role) 조회, 요청자도 멤버여야 함 (story 2.2)
+- `GET /api/users/me` - 인증된 본인 프로필 조회 (Frontend 로그인/새로고침 후 부트스트랩용)
+- `GET /api/users?ids=` - 사용자 프로필 일괄 조회(UUID -> email/displayName), UUID 목록 파라미터
+- `GET /api/users/search?email=` - 이메일 정확히 일치하는 사용자 검색 (DM 시작/멤버 초대용, story 1.2/2.2)
 - `GET /api/presence?userIds=` - 온라인 상태 조회, UUID 목록 파라미터 (FR-6, story 1.4)
 - WebSocket(STOMP) `/ws` 엔드포인트, `/app/chat.send/{channelId}`로 전송, `/topic/channel/{channelId}` 구독 (FR-2, FR-5)
   - CONNECT 인증 성공 시 서버가 자동으로 해당 세션을 온라인으로 표시하고, DISCONNECT 시 오프라인으로 표시 (별도 클라이언트 API 호출 불필요)

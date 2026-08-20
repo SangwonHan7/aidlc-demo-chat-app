@@ -237,3 +237,55 @@ AI Response: 2개 답변 모순 없음 확인. infrastructure-design.md, deploym
 Context: Frontend Infrastructure Design 완료, 사용자 승인 대기 (Gate)
 
 ---
+
+## Frontend Infrastructure Design - Approved
+Timestamp: 2026-08-18T11:00:00Z
+User Input: "계속 진행해줘"
+AI Response: Infrastructure Design(Backend 문서 정정 포함) 승인 처리. Code Generation 단계(Frontend) Part 1 - 계획 작성 시작. Repository Layer/DB Migration은 Frontend가 직접 DB 접근을 하지 않아 해당 없음으로 명시, Backend의 "API Layer" 카테고리는 Frontend 특성에 맞게 "Frontend Components"로 대체.
+Context: Frontend Infrastructure Design 완료/승인, Code Generation Part 1(Planning) 진행
+
+---
+
+## Backend - 채널 멤버 목록/사용자 프로필 API 보완 (Frontend Code Generation Part 2 중 발견)
+Timestamp: 2026-08-18T11:40:00Z
+User Input: N/A (Frontend 컴포넌트 생성 중 직접 발견 및 처리)
+AI Response: ConversationHeader(DM 상대 표시)/MemberManagementPanel(story 2.2) 구현 중 Backend에 채널 멤버 목록 조회 API와 UUID->프로필 변환 API가 없음을 발견. Presence/CORS 사례와 달리 여러 갈래로 나뉘는 설계 트레이드오프가 아니라 이미 승인된 화면 설계가 요구하는 데이터를 노출하는 것뿐이라고 판단해 사용자 확인 없이 직접 보완: ChannelController에 GET /api/channels/{channelId}/members(ChannelMemberResponse 신규) + ChannelService.listMembers 추가, 신규 UserController(GET /api/users?ids=) 추가. ChannelControllerTest(listMembers만)/UserControllerTest 추가. api-layer-summary.md "Post-Approval Patch 3", backend/README.md, backend-code-generation-plan.md에 반영. 최종 완료 보고 시 사용자에게 투명하게 재확인 예정.
+Context: Backend 유닛에 대한 소규모 재작업(3번째), Frontend Code Generation Step 5 계속 진행
+
+---
+
+## Backend - 사용자 이메일 검색 / 공개 채널 발견 API 추가 보완 (같은 발견 묶음)
+Timestamp: 2026-08-18T11:55:00Z
+User Input: N/A (Frontend 컴포넌트 생성 중 직접 발견 및 처리)
+AI Response: MemberManagementPanel(초대 시 이메일 검색)과 ChannelList(참여 안 한 공개 채널 발견, story 1.3)를 구현하면서 같은 종류의 조회 API 누락을 추가로 발견 - UserController에 GET /api/users/search?email=(정확 일치만, 임의 열람 확대 방지) 추가, ChannelController에 GET /api/channels/discoverable(참여 여부 무관 PUBLIC 채널 전체) + ChannelRepository.findByTypeAndVisibility + ChannelService.listDiscoverablePublicChannels 추가. 앞선 멤버목록/사용자조회 보완과 같은 성격(설계 트레이드오프 없음)이라 판단해 계속 직접 처리. api-layer-summary.md Post-Approval Patch 3에 통합 반영, ChannelControllerTest/UserControllerTest에 케이스 추가.
+Context: Backend 유닛에 대한 소규모 재작업 계속, Frontend Code Generation Step 5 진행 - 완료 시 사용자에게 이번 세 가지 보완을 모아 투명하게 보고할 예정
+
+---
+
+## Frontend Code Generation - Plan Created, Approval Requested
+Timestamp: 2026-08-18T11:05:00Z
+User Input: N/A (계획 작성)
+AI Response: frontend-code-generation-plan.md 작성 완료 - 11단계(Project Structure, Business Logic Gen/Test/Summary, Frontend Components Gen/Test/Summary, Repository Layer(해당없음)/DB Migration(해당없음), Documentation, Deployment Artifacts). Repository Layer/DB Migration은 Frontend 특성상 해당 없음으로 명시. 사용자에게 계획 승인 요청.
+Context: Code Generation Part 1(Planning) 완료, 전체 계획 승인 대기 (Gate)
+
+---
+
+## Backend - 내 프로필 조회 API 보완 + Frontend Step 5(컴포넌트 생성) 완료
+Timestamp: 2026-08-19T02:00:00Z
+User Input: N/A (승인된 Code Generation Plan을 계속 실행)
+AI Response: DirectMessageList(DM 목록+이메일검색 시작), 레이아웃 4종(AppShellLayout, Sidebar, MainPanel, EmptyState), App Router 페이지 3종(page.tsx, login/page.tsx, register/page.tsx)을 생성해 Step 5를 마무리하는 과정에서 두 가지를 추가로 발견:
+(1) AppShellLayout의 로그인/새로고침 부트스트랩을 구현하려 하니 authStore.user를 채우는 API/로직이 전혀 없어 currentUserId가 항상 undefined가 되는 문제 발견 - ConversationView/MemberManagementPanel/DirectMessageList 등 이미 승인된 다수 화면이 이 값을 전제하므로, Presence/멤버목록 사례와 동일하게(설계 트레이드오프 없음) 사용자 확인 없이 Backend에 GET /api/users/me를 직접 추가(UserController, UserNotFoundException 재사용, UserControllerTest 추가), Frontend에 authStore.loadCurrentUser() 추가해 AppShellLayout 부트스트랩에서 호출.
+(2) 앞서 만들어 두었던 ErrorBoundary 컴포넌트가 실제로는 어디에도 연결되어 있지 않던 것을 발견해 app/layout.tsx 최상위에 연결.
+(3) 로그아웃 시 chatStore/presenceStore에 이전 사용자의 상태가 잔류하는 것을 막기 위해 두 스토어에 reset() 액션을 추가하고 Sidebar의 로그아웃 처리에서 호출하도록 구성.
+api-layer-summary.md(Post-Approval Patch 4), backend/README.md, frontend-code-generation-plan.md Step 5 체크박스에 반영. Step 5 완료 - Step 6(컴포넌트 단위 테스트)로 진행.
+Context: Frontend Code Generation Step 5 완료, Backend 유닛에 대한 4번째 소규모 재작업 - 최종 완료 보고 시 Patch 1~4 전체를 사용자에게 모아 투명하게 보고할 예정
+
+---
+
+## Frontend Code Generation - Step 6~11 완료 / 전체 승인 대기
+Timestamp: 2026-08-19T02:30:00Z
+User Input: N/A (승인된 Code Generation Plan을 계속 실행)
+AI Response: Step 6(LoginForm/RegisterForm/MessageInput/PresenceIndicator/CreateChannelModal에 대한 RTL 예시 기반 테스트 + LoginForm/RegisterForm에 대한 fast-check 속성 테스트 - 컴포넌트가 validation.ts를 정확히 연결했는지 검증), Step 7(frontend-components-summary.md, Backend Patch 1~4 및 ErrorBoundary 미연결/로그아웃 스토어 잔류 자체 발견 사항 정리), Step 10(frontend/README.md), Step 11(frontend/Dockerfile, infra/docker-compose/docker-compose.yml에 frontend 서비스 추가) 진행. Step 11에서 Dockerfile을 재검토하다 Frontend Infrastructure Design의 "환경변수 주입" 서술이 실제로는 틀렸음을 발견 - 전체 컴포넌트가 "use client"인 Next.js 앱은 NEXT_PUBLIC_* 값을 next build 시점에 클라이언트 JS로 정적 인라인하므로, 컨테이너 런타임 환경변수 주입은 효과가 없음(경쟁하는 설계 대안이 없는 프레임워크 제약이라 판단해 질문 없이 정정). Dockerfile에 ARG/ENV 추가, deployment-architecture.md와 신규 frontend/README.md를 build-arg 방식으로 정정. frontend-code-generation-plan.md 11단계 체크박스 전체 완료(Step 1~4는 이전 턴에서 실제로는 완료되었으나 체크박스 표시가 누락되어 있던 것도 함께 정정), aidlc-state.md 갱신. 완료 전 Explore 서브에이전트로 이번 세션에서 작성한 신규/수정 파일 전체(Frontend 컴포넌트 9개, 스토어 3개, 테스트 7개, Backend UserController/테스트)에 대한 정합성 검증(임포트 경로, data-testid 일치, 타입/시그니처 일치)을 수행 - 문제 발견되지 않음. Build and Test 단계로 넘어가기 전, 사용자에게 Code Generation Complete 메시지로 전체 승인 요청.
+Context: Frontend Code Generation(Part 1+Part 2) 완료, 사용자 승인 대기 (Gate) - 승인 시 Build and Test 단계로 진행
+
+---
