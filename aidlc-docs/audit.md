@@ -530,3 +530,15 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 단순화) - 승인 게이트 없음
 
 ---
+
+## Post-Workflow Next Steps - CD 빌드 실패 수정 (buildx cache export)
+
+Timestamp: 2026-08-24T03:00:00Z
+User Input: "build and push에서 아래 에러 발생했어. 확인해줘" (로그: `ERROR: failed to build: Cache export is not supported for the docker driver.`, frontend 이미지 빌드 시 `NEXT_PUBLIC_API_BASE_URL=http://peer-evaluation-system.i234.me:8080` 등 build-arg가 실제 NAS_HOST 값으로 정상 치환된 것도 로그에서 확인됨)
+AI Response: `cd.yml`을 재확인해 `docker/build-push-action@v5`에 `cache-to: type=gha`를 쓰면서도 `docker/setup-buildx-action`을 호출한 적이 없었음을 발견 - GitHub 호스팅 러너에 기본 등록된 buildx builder는 driver=`docker`인데, 이 driver는 `type=gha` 같은 캐시 export 백엔드를 지원하지 않아(공식 문서에도 명시된 제약) 발생한 에러. 설계 트레이드오프가 없는 명백한 설정 누락으로 판단해 질문 없이 직접 수정 - `build-backend`/`build-frontend` 두 job 모두에 `Log in to GHCR` 앞에 `docker/setup-buildx-action@v3` 스텝을 추가해 `docker-container` driver builder를 새로 만들도록 함. 로그에 함께 나온 "Node 20 is being deprecated" 경고는 액션 내부 구현이 아직 Node 20을 쓰는 데서 오는 비차단성 경고일 뿐 이번 실패의 원인이 아니라고 판단해 별도 조치하지 않음(추후 액션 버전이 올라가면 자연히 해소됨).
+`python3 -c yaml.safe_load`로 두 job의 스텝 순서(`checkout` → `Compute lowercase image repo name` → `Set up Docker Buildx` → `Log in to GHCR` → `Build and push`)까지 확인.
+Files Modified:
+- .github/workflows/cd.yml (`build-backend`/`build-frontend`에 `Set up Docker Buildx` 스텝 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 빌드 성공 여부 확인 필요
+
+---
