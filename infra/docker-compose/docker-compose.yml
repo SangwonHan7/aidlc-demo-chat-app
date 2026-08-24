@@ -13,8 +13,12 @@ services:
       POSTGRES_DB: quickchat
       POSTGRES_USER: quickchat
       POSTGRES_PASSWORD: quickchat-local-dev-only
+    # 호스트 포트만 5433으로 바꿨다(컨테이너 내부 포트는 그대로 5432) - NAS에 docker가 아닌
+    # 별도 postgres가 이미 5432를 쓰고 있어(kill해도 계속 재기동됨, 실제로 겪은 문제) 충돌 회피.
+    # backend는 "postgres:5432"(컨테이너 간 내부 네트워크)로 접속하므로 이 변경과 무관하게 그대로 동작한다 -
+    # 이 5433은 NAS에서 psql 등으로 직접 접속하고 싶을 때만 쓰는 포트다.
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 

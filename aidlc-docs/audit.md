@@ -581,3 +581,17 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. 사용자가 현재 충돌 상태인 컨테이너를 6-5 절차대로 정리하고 두 `.env`의 `COMPOSE_PROJECT_NAME`을 맞춘 뒤 재배포 결과 확인 필요
 
 ---
+
+## Post-Workflow Next Steps - postgres 호스트 포트 변경 (NAS 자체 postgres와 충돌)
+
+Timestamp: 2026-08-24T04:00:00Z
+User Input: "5432 포트에 postgres 가 이미 떠있어(docker 아님) kill 해도 다시 살아나고 있어. 포트를 변경하면 안돼?"
+AI Response: 직전까지의 포트 충돌은 docker compose 프로젝트 이름 불일치가 원인이었지만, 이번엔 NAS 자체에 docker와 무관한 postgres(재기동되는 걸 보면 systemd 등 슈퍼바이저가 관리하는 서비스로 추정)가 5432를 이미 점유하고 있어 근본적으로 다른 문제 - kill해도 계속 살아나므로 그 서비스를 없애는 대신 컨테이너 쪽 호스트 포트를 바꾸는 게 맞는 방향이라고 판단. `docker-compose.yml`을 확인해 `backend`의 `DB_URL`이 `jdbc:postgresql://postgres:5432/quickchat`(컨테이너 간 내부 네트워크 주소)를 쓰고 있어, 호스트 포트 매핑만 바꿔도 backend 연결에는 전혀 영향이 없음을 확인 - 컨테이너 내부 포트(5432)와 backend 연결 방식은 그대로 두고 호스트 쪽(왼쪽) 포트만 5433으로 변경. 설계 트레이드오프 없는 순수 설정 변경으로 판단해 질문 없이 직접 처리.
+`postgres` 서비스의 `ports`를 `"5432:5432"` → `"5433:5432"`로 수정하고 그 이유(NAS 자체 서비스와의 충돌, backend 연결에는 무관함, 5433은 NAS에서 직접 `psql` 접속할 때만 쓰는 용도)를 주석으로 명시. `README.md`의 6-5(문제 해결) 섹션에 이 케이스(docker가 아닌 서비스가 포트를 점유한 경우)와 redis(6379)/kafka(9092)/vault(8200)도 같은 방식(호스트 쪽 포트만 변경)으로 대응할 수 있다는 안내 추가.
+`python3 -c yaml.safe_load`로 재검증.
+Files Modified:
+- infra/docker-compose/docker-compose.yml (`postgres` 호스트 포트 5432 → 5433)
+- infra/docker-compose/README.md (6-5에 non-docker 포트 점유 케이스 안내 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. 사용자가 `docker compose up --build -d` 재실행 후 postgres가 정상 기동되는지, backend가 정상적으로 연결되는지 확인 필요
+
+---

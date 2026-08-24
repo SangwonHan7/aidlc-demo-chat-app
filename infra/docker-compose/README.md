@@ -101,5 +101,7 @@ docker compose up --build -d
 ```
 이후 자동배포가 실행되면 같은 `quickchat` 프로젝트 안에서 backend/frontend만 갈아끼우게 된다.
 
+**NAS에 docker가 아닌 서비스가 이미 그 포트를 쓰고 있는 경우**(예: NAS 자체 PostgreSQL 패키지가 5432를 쓰고 있어 kill해도 다시 떠 있는 경우): docker 컨테이너 쪽 문제가 아니라 포트가 이미 다른 프로세스 소유라 근본적으로 피해야 한다. `docker-compose.yml`의 `postgres` 서비스는 호스트 포트를 `5433:5432`로 바꿔뒀다(컨테이너 내부 포트는 여전히 5432이고 backend는 `postgres:5432`라는 내부 네트워크 주소로 접속하므로 이 변경과 무관하게 동작함 - 5433은 NAS에서 `psql` 등으로 직접 접속하고 싶을 때만 쓰는 포트). redis(6379)/kafka(9092)/vault(8200)도 같은 방식으로 겹치면 왼쪽(호스트) 포트만 다른 값으로 바꾸면 된다.
+
 ## 참고: k3s 매니페스트
 `infra/k3s/`에 namespaces/data/app/observability 매니페스트가 이미 작성되어 있다(원래 설계에 따른 k3s 배포 경로). 이번에는 사용하지 않지만, 추후 다중 노드/오토스케일링/롤링 업데이트가 필요해지면 참고할 수 있도록 남겨둔다.
