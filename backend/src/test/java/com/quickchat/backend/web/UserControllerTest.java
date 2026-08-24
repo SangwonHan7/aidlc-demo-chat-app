@@ -2,6 +2,7 @@ package com.quickchat.backend.web;
 
 import com.quickchat.backend.domain.User;
 import com.quickchat.backend.repository.UserRepository;
+import com.quickchat.backend.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,6 +29,9 @@ class UserControllerTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     void meReturnsProfileForAuthenticatedPrincipal() throws Exception {

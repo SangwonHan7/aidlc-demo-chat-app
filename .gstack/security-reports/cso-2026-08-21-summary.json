@@ -1,0 +1,119 @@
+{
+  "schema_version": "cso-4.0.2",
+  "submitted_at": "2026-08-21T00:00:00+09:00",
+  "service": "QuickChat",
+  "owner": "한상원 (hsw190701@lgcns.com)",
+  "git_commit": "0dfec59c88bcc3ff6ce9029d5fa2c29960ee403a",
+  "git_commit_note": "branch 12-frontend-code-generation. Identical commit hash to the 2026-08-20 audit (verified by reading .git/refs/heads/12-frontend-code-generation directly; no git CLI available). H1/H2/M1 fixes verified in this audit exist only as uncommitted working-tree changes on top of this commit, same caveat as the prior report.",
+  "target": "production",
+  "gate_mode": "standard",
+  "gate_mode_note": "Same mode as the 2026-08-20 audit, chosen for a fair comparison. Prior report's note about 'strict' possibly being more appropriate for a PII/chat-content service still applies and is repeated here.",
+  "gate_result": "PASS",
+  "previous_gate_result": "BLOCKED",
+  "skill_version": "4.0.2",
+  "findings": {
+    "critical": 0,
+    "high": 1,
+    "medium": 8,
+    "low": 8,
+    "oss_issues": 0
+  },
+  "findings_detail": {
+    "high": [
+      {"id": "H3", "title": "Spring Boot 3.3.2 / Spring Framework 6.1.x 라인 OSS 보안 패치 지원 종료(EOL)", "file": "backend/build.gradle", "lines": "3", "owasp": "A06", "cwe": "CWE-1104", "confidence": 7, "status": "PERSISTING"}
+    ],
+    "medium": [
+      {"id": "M2", "title": "사용자 조회 API 관계 기반 인가 누락", "file": "backend/src/main/java/com/quickchat/backend/web/UserController.java", "lines": "43-46,54-57", "owasp": "A01", "cwe": "CWE-862", "confidence": 8, "status": "PERSISTING"},
+      {"id": "M3", "title": "axios 1.7.4 HIGH CVE 2건 + lock 파일 부재", "file": "frontend/package.json", "lines": "17", "owasp": "A06", "cwe": "CWE-1104", "confidence": 6, "status": "PERSISTING"},
+      {"id": "M4", "title": "Next.js 14.2.5 outdated (14.2.35 권장 라인 미달)", "file": "frontend/package.json", "lines": "13", "owasp": "A06", "cwe": "CWE-1104", "confidence": 6, "status": "PERSISTING"},
+      {"id": "M5", "title": "JWT Access/Refresh Token localStorage 저장", "file": "frontend/src/store/authStore.ts", "lines": "41-49,107-115", "owasp": "A02", "cwe": "CWE-522", "confidence": 6, "status": "PERSISTING"},
+      {"id": "M6", "title": "의존성 lock 파일 부재 (양쪽 생태계)", "file": "frontend/package.json; backend/build.gradle", "lines": "N/A", "owasp": "A08", "cwe": "CWE-1357", "confidence": 7, "status": "PERSISTING"},
+      {"id": "M7", "title": "Frontend Docker 컨테이너 root 실행", "file": "frontend/Dockerfile", "lines": "21-30", "owasp": "A05", "cwe": "CWE-250", "confidence": 8, "status": "PERSISTING"},
+      {"id": "M8", "title": "docker-compose.yml 평문 자격증명 + Vault ROOT 토큰/포트 노출", "file": "infra/docker-compose/docker-compose.yml", "lines": "13,42-45,59,63", "owasp": "A02", "cwe": "CWE-798", "confidence": 7, "status": "PERSISTING"},
+      {"id": "M9", "title": "이메일 단위 계정 잠금의 표적형 DoS 악용 가능성", "file": "backend/src/main/java/com/quickchat/backend/redis/LoginLockRedisService.java", "lines": "14-56", "owasp": "A04", "cwe": "CWE-307", "confidence": 7, "status": "PERSISTING"}
+    ],
+    "low": [
+      {"id": "L1", "title": "Swagger UI/OpenAPI 무인증 공개", "file": "backend/src/main/java/com/quickchat/backend/security/SecurityConfig.java", "lines": "62-63", "owasp": "A05", "cwe": "CWE-200", "confidence": 7, "status": "PERSISTING"},
+      {"id": "L2", "title": "회원가입 API 이메일 존재 열거", "file": "backend/src/main/java/com/quickchat/backend/web/AuthController.java", "lines": "25-30", "owasp": "A07", "cwe": "CWE-203", "confidence": 8, "status": "PERSISTING"},
+      {"id": "L3", "title": "이메일 대소문자 정규화 부재", "file": "backend/src/main/java/com/quickchat/backend/service/AuthService.java", "lines": "42-49", "owasp": "A07", "cwe": "CWE-620", "confidence": 6, "status": "PERSISTING"},
+      {"id": "L4", "title": "채널명/메시지 본문 길이·공백 검증 누락", "file": "backend/src/main/java/com/quickchat/backend/websocket/SendMessageStompRequest.java; backend/src/main/java/com/quickchat/backend/web/dto/CreateChannelRequest.java", "lines": "1-4;8-11", "owasp": "A04", "cwe": "CWE-20", "confidence": 7, "status": "PERSISTING_PARTIAL_IMPROVEMENT", "note": "CreateChannelRequest에 @NotBlank/@NotNull 추가됨(공백 케이스만 개선), @Size(max) 및 STOMP 경로 검증은 여전히 없음"},
+      {"id": "L5", "title": "고정 윈도우 rate limiter 경계 버스트", "file": "backend/src/main/java/com/quickchat/backend/redis/MessageRateLimitService.java", "lines": "22-37", "owasp": "A04", "cwe": "CWE-799", "confidence": 6, "status": "PERSISTING"},
+      {"id": "L6", "title": "production(k3s) 매니페스트 저장소 부재 - 런타임 통제 확인 불가", "file": "infra/ (k3s manifests absent)", "lines": "N/A", "owasp": "A05", "cwe": "N/A", "confidence": 6, "status": "PERSISTING"},
+      {"id": "L7", "title": "채널 생성/참여/초대 API rate limit 없음", "file": "backend/src/main/java/com/quickchat/backend/web/ChannelController.java", "lines": "N/A", "owasp": "A04", "cwe": "CWE-770", "confidence": 6, "status": "PERSISTING"},
+      {"id": "L8", "title": "Frontend 프로덕션 이미지에 devDependencies 포함", "file": "frontend/Dockerfile", "lines": "5,21-27", "owasp": "A05", "cwe": "N/A", "confidence": 7, "status": "PERSISTING"}
+    ],
+    "resolved": [
+      {"id": "H1", "title": "채널 join API 가시성 검증 누락", "file": "backend/src/main/java/com/quickchat/backend/service/ChannelService.java", "lines": "78-87", "verification": "joinChannel()에 channel.getVisibility() != ChannelVisibility.PUBLIC 검사가 추가되어 있음을 코드 직독으로 확인. ChannelVisibility enum이 PUBLIC/INVITE_ONLY 2값뿐이고 DIRECT 채널은 항상 INVITE_ONLY로 생성됨을 함께 확인해 이 검사 하나로 그룹/DM 모두 커버됨을 검증."},
+      {"id": "H2", "title": "STOMP SUBSCRIBE 멤버십 인가 부재", "file": "backend/src/main/java/com/quickchat/backend/websocket/StompAuthChannelInterceptor.java", "lines": "79-101", "verification": "SUBSCRIBE 분기 추가 및 requireMembershipForSubscription()이 channelService.requireMember()를 호출해 비멤버 구독을 차단함을 코드 직독으로 확인."},
+      {"id": "M1", "title": "WebSocket CORS 전면 허용", "file": "backend/src/main/java/com/quickchat/backend/websocket/WebSocketConfig.java", "lines": "34-36", "verification": "registerStompEndpoints()가 setAllowedOriginPatterns(\"*\") 대신 REST와 동일한 ${quickchat.cors.allowed-origin} 값을 사용함을 코드 직독으로 확인."}
+    ],
+    "new": []
+  },
+  "trend": {
+    "resolved_count": 3,
+    "resolved_ids": ["H1", "H2", "M1"],
+    "persisting_count": 17,
+    "persisting_ids": ["H3", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"],
+    "new_count": 0,
+    "new_ids": [],
+    "note_new_check": "RedisBroadcastListener.java의 필드명 버그 수정(MessageResponse.from(ChatMessageEvent) 신규 팩토리)을 직접 검토했으며, ChatMessageEvent에 REST 응답에 없는 내부 전용 필드가 없어 정보노출 등 신규 보안 결함을 만들지 않음을 확인."
+  },
+  "source_review_scope": {
+    "target_source_file_count": 145,
+    "reviewed_source_file_count": 27,
+    "scope_difference_reason": "최초 감사(08-20)가 아니라 baseline 대비 변경분 재검증이므로, H1/H2/M1 수정 검증 대상 파일과 M2-M9/L1-L8 각 항목의 근거 파일(전 항목 spot-check), 그리고 신규 언급된 RedisBroadcastListener/MessageResponse 변경분을 위험 기반으로 선택해 재열람. 08-20에 이미 정독했고 이번에 변경 언급이 없었던 파일(JwtAuthenticationFilter, JwtTokenProvider, RefreshTokenRedisService 등)은 이번 세션에서 다시 열지 않고 08-20 결과를 carry-forward.",
+    "reviewed_files": [
+      {"category": "이전 보고서", "path": ".gstack/security-reports/cso-2026-08-20.md", "purpose": "baseline 발견 항목 전체 확인"},
+      {"category": "이전 보고서", "path": ".gstack/security-reports/cso-2026-08-20-summary.json", "purpose": "baseline 기계판독 요약 확인"},
+      {"category": "H1 재검증", "path": "backend/src/main/java/com/quickchat/backend/service/ChannelService.java", "purpose": "joinChannel() visibility 검사 추가 여부 확인"},
+      {"category": "H1 재검증", "path": "backend/src/main/java/com/quickchat/backend/domain/ChannelVisibility.java", "purpose": "enum 값 확인"},
+      {"category": "H1 재검증", "path": "backend/src/main/java/com/quickchat/backend/domain/ChannelType.java", "purpose": "DIRECT/GROUP 타입 확인"},
+      {"category": "H2 재검증", "path": "backend/src/main/java/com/quickchat/backend/websocket/StompAuthChannelInterceptor.java", "purpose": "SUBSCRIBE 분기 및 requireMember 호출 확인"},
+      {"category": "M1 재검증", "path": "backend/src/main/java/com/quickchat/backend/websocket/WebSocketConfig.java", "purpose": "allowedOrigin 사용 여부 확인"},
+      {"category": "커밋 확인", "path": ".git/refs/heads/12-frontend-code-generation", "purpose": "현재 커밋 해시 확인"},
+      {"category": "H3 재확인", "path": "backend/build.gradle", "purpose": "Spring Boot 버전 변경 여부 확인"},
+      {"category": "M3/M4 재확인", "path": "frontend/package.json", "purpose": "axios/Next.js 버전 변경 여부 확인"},
+      {"category": "M2 재확인", "path": "backend/src/main/java/com/quickchat/backend/web/UserController.java", "purpose": "관계 기반 인가 추가 여부 확인"},
+      {"category": "M5 재확인", "path": "frontend/src/store/authStore.ts", "purpose": "토큰 저장 위치 변경 여부 확인"},
+      {"category": "M7/L8 재확인", "path": "frontend/Dockerfile", "purpose": "USER 지시어, devDependency 정리 여부 확인"},
+      {"category": "M8 재확인", "path": "infra/docker-compose/docker-compose.yml", "purpose": "평문 자격증명/포트 노출 변경 여부 확인"},
+      {"category": "신규 변경 확인", "path": "backend/src/main/java/com/quickchat/backend/websocket/RedisBroadcastListener.java", "purpose": "필드명 버그 수정 내용, 정보노출 여부 확인"},
+      {"category": "신규 변경 확인", "path": "backend/src/main/java/com/quickchat/backend/web/dto/MessageResponse.java", "purpose": "from(ChatMessageEvent) 팩토리 신규 필드 노출 여부 확인"},
+      {"category": "신규 변경 확인", "path": "backend/src/main/java/com/quickchat/backend/kafka/ChatMessageEvent.java", "purpose": "내부 이벤트 필드 구성 확인"},
+      {"category": "M6 재확인", "path": "package-lock.json / yarn.lock / pnpm-lock.yaml / gradle.lockfile (Glob, 미발견)", "purpose": "lock 파일 생성 여부 확인"},
+      {"category": "L4 재확인", "path": "backend/src/main/java/com/quickchat/backend/websocket/SendMessageStompRequest.java", "purpose": "Bean Validation 애너테이션 추가 여부 확인"},
+      {"category": "L4 재확인", "path": "backend/src/main/java/com/quickchat/backend/web/dto/CreateChannelRequest.java", "purpose": "@Size(max) 추가 여부 확인"},
+      {"category": "L5 재확인", "path": "backend/src/main/java/com/quickchat/backend/redis/MessageRateLimitService.java", "purpose": "고정 윈도우 로직 변경 여부 확인"},
+      {"category": "L1 재확인", "path": "backend/src/main/java/com/quickchat/backend/security/SecurityConfig.java", "purpose": "Swagger permitAll 변경 여부 확인"},
+      {"category": "L6 재확인", "path": "infra/** (Glob)", "purpose": "k3s 매니페스트 신규 추가 여부 확인"},
+      {"category": "L2/M9/I7 재확인", "path": "backend/src/main/java/com/quickchat/backend/service/AuthService.java", "purpose": "이메일 정규화/열거/잠금 로직 변경 여부 확인"},
+      {"category": "M9 재확인", "path": "backend/src/main/java/com/quickchat/backend/redis/LoginLockRedisService.java", "purpose": "잠금 키 설계 변경 여부 확인"},
+      {"category": "L2 재확인", "path": "backend/src/main/java/com/quickchat/backend/web/AuthController.java", "purpose": "회원가입 응답 변경 여부 확인"},
+      {"category": "L7 재확인", "path": "backend/src/main/java/com/quickchat/backend/web/ChannelController.java", "purpose": "rate limit 추가 여부, @Valid 적용 범위 확인"},
+      {"category": "대조 확인", "path": "backend/Dockerfile", "purpose": "non-root 유지 여부 확인"},
+      {"category": "I3 재확인", "path": "backend/src/main/java/com/quickchat/backend/config/KafkaConfig.java", "purpose": "TRUSTED_PACKAGES 유지 여부 확인"},
+      {"category": "I1 재확인", "path": "frontend/src/components/conversation/MessageList.tsx", "purpose": "XSS sink 패턴 유지 여부 확인"},
+      {"category": "I2 재확인", "path": "backend/src/main/java/com/quickchat/backend/repository/MessageRepository.java", "purpose": "파라미터 바인딩 유지 여부 확인"},
+      {"category": "문서 확인", "path": "aidlc-docs/aidlc-state.md, aidlc-docs/audit.md (grep)", "purpose": "Post-Approval Patch 이력, 추가 변경사항 존재 여부 확인"}
+    ]
+  },
+  "sbom": {
+    "total_components": 44,
+    "components_with_cve": 2,
+    "unknown_license": 0,
+    "regenerated": false,
+    "regeneration_note": "backend/build.gradle과 frontend/package.json이 2026-08-20 시점과 문자 단위로 동일함을 재확인해 기존 SBOM(.gstack/sbom/sbom-2026-08-20.*)이 현재도 유효하다고 판단, 새로 생성하지 않음."
+  },
+  "deploy_blocked": false,
+  "block_reason": null,
+  "pass_reason": "CRITICAL 0건, HIGH 1건(H3, Spring Boot EOL)만 남아 standard 게이트 허용 기준(HIGH 2건 이하)을 충족. H1/H2/M1은 코드 재확인으로 실제 해결 확인됨.",
+  "report_path": ".gstack/security-reports/cso-2026-08-21.md",
+  "previous_report_path": ".gstack/security-reports/cso-2026-08-20.md",
+  "risk_acceptance_template_path": null,
+  "risk_acceptance_note": "게이트 PASS이므로 위험수용서 생성하지 않음. 08-20 시점의 risk-acceptance-2026-08-20.md는 이력 보존을 위해 유지.",
+  "sbom_paths": {
+    "cyclonedx": ".gstack/sbom/sbom-2026-08-20.cdx.json",
+    "spdx": ".gstack/sbom/sbom-2026-08-20.spdx"
+  },
+  "recommendation": "standard 게이트는 PASS이지만 strict 게이트 기준으로는 H3 1건으로 여전히 BLOCKED. PII/채팅 콘텐츠를 다루는 서비스 특성상 담당자/정보보안팀이 standard가 적절한 기준인지 재확인 권고. H1/H2/M1 수정이 아직 커밋되지 않은 작업 트리 변경 상태이므로 정식 커밋 확정 후 최종 재점검 권고."
+}

@@ -45,10 +45,13 @@ export function AppShellLayout() {
   }, [isAuthenticated, user, loadCurrentUser, logout]);
 
   // 4) 프로필까지 준비되면 WS 연결 + 채널 목록 로드. 재연결 시에는 REST 재조회로 갭을 보완(Question 5 답변 A).
+  // 채널 목록을 다 불러온 뒤 restoreActiveChannel()로 새로고침 전에 보던 채널을 복원한다(2026-08-21
+  // 발견 - 새로고침하면 activeChannelId가 초기화되어 대화가 사라지던 문제, chatStore.ts 주석 참고).
+  // 복원되면 ConversationView의 기존 effect가 loadHistory()를 호출해 실제 메시지 이력을 다시 불러온다.
   useEffect(() => {
     if (!isAuthenticated || !user || !accessToken) return;
     connect(accessToken);
-    void loadChannels();
+    void loadChannels().then(() => useChatStore.getState().restoreActiveChannel());
     setOnReconnected(() => {
       void loadChannels();
       const activeChannelId = useChatStore.getState().activeChannelId;

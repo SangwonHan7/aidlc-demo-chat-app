@@ -3,6 +3,7 @@ package com.quickchat.backend.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quickchat.backend.domain.User;
 import com.quickchat.backend.exception.EmailAlreadyExistsException;
+import com.quickchat.backend.security.JwtTokenProvider;
 import com.quickchat.backend.service.AuthService;
 import com.quickchat.backend.service.TokenPair;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     void registerReturns201WithUserBody() throws Exception {

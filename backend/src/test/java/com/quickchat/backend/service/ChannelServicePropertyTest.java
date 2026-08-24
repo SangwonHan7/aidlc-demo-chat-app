@@ -119,6 +119,11 @@ class ChannelServicePropertyTest {
                 UUID channelId = inv.getArgument(0);
                 return harness.members.stream().filter(m -> m.getChannelId().equals(channelId)).toList();
             });
+            org.mockito.Mockito.doAnswer(inv -> {
+                ChannelMemberId id = inv.getArgument(0);
+                harness.members.removeIf(m -> new ChannelMemberId(m.getChannelId(), m.getUserId()).equals(id));
+                return null;
+            }).when(memberRepository).deleteById(any());
 
             return harness;
         }

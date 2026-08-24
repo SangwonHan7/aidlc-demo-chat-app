@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import { usePresenceStore } from "@/store/presenceStore";
 import { subscribeToChannel } from "@/lib/stompClient";
 import { resolveDirectChannelPeer } from "@/lib/directChannel";
+import { fetchMemberProfilesById } from "@/lib/memberProfiles";
 import { ConversationHeader } from "./ConversationHeader";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
@@ -23,12 +24,21 @@ export function ConversationView() {
   const currentUserId = useAuthStore((s) => s.user?.id);
   const [managingMembers, setManagingMembers] = useState(false);
   const [directPeer, setDirectPeer] = useState<User | null>(null);
+  const [senderProfiles, setSenderProfiles] = useState<Record<string, User>>({});
 
   useEffect(() => {
     if (!activeChannelId) return;
     void loadHistory(activeChannelId);
     subscribeToChannel(activeChannelId, (payload) => receiveMessage(payload as ChatMessage));
   }, [activeChannelId, loadHistory, receiveMessage]);
+
+  // 채팅에서 발신자를 구분할 수 있도록(2026-08-22 사용자 요청) 채널 멤버 프로필을 미리 불러와
+  // MessageList에 넘긴다. 새 멤버가 초대되는 등 목록이 바뀔 수 있어 채널이 바뀔 때마다 다시 불러온다.
+  useEffect(() => {
+    setSenderProfiles({});
+    if (!activeChannelId) return;
+    void fetchMemberProfilesById(activeChannelId).then(setSenderProfiles);
+  }, [activeChannelId]);
 
   // DIRECT 채널은 channel.name이 화면용 문자열이 아니므로(lib/directChannel.ts 참고), 상대방
   // displayName을 별도로 조회한다.
@@ -61,7 +71,7 @@ export function ConversationView() {
         otherUserId={channel.type === "DIRECT" ? directPeer?.id : undefined}
         onManageMembers={() => setManagingMembers(true)}
       />
-      <MessageList channelId={activeChannelId} />
+      <MessageList channelId={activeChannelId} senderProfiles={senderProfiles} />
       <MessageInput channelId={activeChannelId} />
       {managingMembers && (
         <MemberManagementPanel channelId={activeChannelId} onClose={() => setManagingMembers(false)} />

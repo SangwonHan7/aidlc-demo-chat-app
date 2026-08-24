@@ -1,0 +1,407 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: quickchat-sbom-2026-08-20
+DocumentNamespace: https://quickchat.internal/spdx/quickchat-2026-08-20-0dfec59c
+Creator: Tool: cso-skill-4.0.2
+Created: 2026-08-20T00:00:00Z
+##### Notes
+## 이 SPDX 문서는 최소본(minimal)입니다. 주 SBOM 산출물은 sbom-2026-08-20.cdx.json(CycloneDX 1.5)이며,
+## 여기에는 direct(직접) 의존성만 나열합니다. transitive 의존성은 lock 파일 부재로 정확히 열거할 수 없어
+## 포함하지 않았습니다. PackageDownloadLocation/PackageChecksum은 실제 리졸버/다운로드를 수행하지
+## 않아 모두 NOASSERTION 입니다 (허위 값 기재 방지).
+
+## ===== backend (Maven, org.quickchat:quickchat-backend:0.1.0) =====
+
+PackageName: spring-boot-starter-web
+SPDXID: SPDXRef-Package-spring-boot-starter-web
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-web
+
+PackageName: spring-boot-starter-websocket
+SPDXID: SPDXRef-Package-spring-boot-starter-websocket
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-websocket
+
+PackageName: spring-boot-starter-security
+SPDXID: SPDXRef-Package-spring-boot-starter-security
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-security
+
+PackageName: spring-boot-starter-data-jpa
+SPDXID: SPDXRef-Package-spring-boot-starter-data-jpa
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-data-jpa
+
+PackageName: spring-boot-starter-data-redis
+SPDXID: SPDXRef-Package-spring-boot-starter-data-redis
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-data-redis
+
+PackageName: spring-boot-starter-actuator
+SPDXID: SPDXRef-Package-spring-boot-starter-actuator
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-actuator
+
+PackageName: spring-boot-starter-validation
+SPDXID: SPDXRef-Package-spring-boot-starter-validation
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-validation
+
+PackageName: spring-kafka
+SPDXID: SPDXRef-Package-spring-kafka
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-kafka
+
+PackageName: flyway-core
+SPDXID: SPDXRef-Package-flyway-core
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-flyway-core
+
+PackageName: flyway-database-postgresql
+SPDXID: SPDXRef-Package-flyway-database-postgresql
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-flyway-database-postgresql
+
+PackageName: micrometer-registry-prometheus
+SPDXID: SPDXRef-Package-micrometer-registry-prometheus
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-micrometer-registry-prometheus
+
+PackageName: jjwt-api
+SPDXID: SPDXRef-Package-jjwt-api
+PackageVersion: 0.12.6
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-jjwt-api
+
+PackageName: jjwt-impl
+SPDXID: SPDXRef-Package-jjwt-impl
+PackageVersion: 0.12.6
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-jjwt-impl
+
+PackageName: jjwt-jackson
+SPDXID: SPDXRef-Package-jjwt-jackson
+PackageVersion: 0.12.6
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-jjwt-jackson
+
+PackageName: springdoc-openapi-starter-webmvc-ui
+SPDXID: SPDXRef-Package-springdoc-openapi-starter-webmvc-ui
+PackageVersion: 2.6.0
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-springdoc-openapi-starter-webmvc-ui
+
+PackageName: postgresql-jdbc
+SPDXID: SPDXRef-Package-postgresql-jdbc
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: BSD-2-Clause
+PackageLicenseDeclared: BSD-2-Clause
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-postgresql-jdbc
+
+PackageName: lombok
+SPDXID: SPDXRef-Package-lombok
+PackageVersion: 1.18.34
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: compileOnly/annotationProcessor - 런타임 jar에 포함되지 않음
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-lombok
+
+PackageName: spring-boot-starter-test
+SPDXID: SPDXRef-Package-spring-boot-starter-test
+PackageVersion: 3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: testImplementation - 배포 아티팩트 미포함
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-boot-starter-test
+
+PackageName: spring-security-test
+SPDXID: SPDXRef-Package-spring-security-test
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: testImplementation - 배포 아티팩트 미포함
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-security-test
+
+PackageName: spring-kafka-test
+SPDXID: SPDXRef-Package-spring-kafka-test
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: testImplementation - 배포 아티팩트 미포함
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-spring-kafka-test
+
+PackageName: jqwik
+SPDXID: SPDXRef-Package-jqwik
+PackageVersion: 1.8.5
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: EPL-2.0
+PackageLicenseDeclared: EPL-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: testImplementation - weak copyleft이나 배포 아티팩트 미포함이라 의무 없음
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-jqwik
+
+PackageName: junit-platform-launcher
+SPDXID: SPDXRef-Package-junit-platform-launcher
+PackageVersion: bom-managed-spring-boot-3.3.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: EPL-2.0
+PackageLicenseDeclared: EPL-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: testRuntimeOnly - 배포 아티팩트 미포함
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-junit-platform-launcher
+
+## ===== frontend (npm, quickchat-frontend@0.1.0) =====
+
+PackageName: next
+SPDXID: SPDXRef-Package-next
+PackageVersion: 14.2.5
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: 알려진 CVE 대비 outdated, 상세는 cso-2026-08-20.md M4 참고
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-next
+
+PackageName: react
+SPDXID: SPDXRef-Package-react
+PackageVersion: 18.3.1
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: package.json 선언은 ^18.3.1
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-react
+
+PackageName: react-dom
+SPDXID: SPDXRef-Package-react-dom
+PackageVersion: 18.3.1
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-react-dom
+
+PackageName: zustand
+SPDXID: SPDXRef-Package-zustand
+PackageVersion: 4.5.4
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-zustand
+
+PackageName: axios
+SPDXID: SPDXRef-Package-axios
+PackageVersion: 1.7.4
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: CVE-2025-27152, CVE-2025-58754 대상 범위. lock 파일 부재로 실제 설치본 불확. 상세는 cso-2026-08-20.md M3 참고
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-axios
+
+PackageName: stompjs
+SPDXID: SPDXRef-Package-stompjs
+PackageVersion: 7.0.0
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: npm 패키지명 @stomp/stompjs
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-stompjs
+
+PackageName: react-window
+SPDXID: SPDXRef-Package-react-window
+PackageVersion: 1.8.10
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-react-window
+
+PackageName: typescript
+SPDXID: SPDXRef-Package-typescript
+PackageVersion: 5.5.4
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency. Dockerfile이 npm prune을 하지 않아 런타임 이미지에 남음(L8)
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-typescript
+
+PackageName: tailwindcss
+SPDXID: SPDXRef-Package-tailwindcss
+PackageVersion: 3.4.7
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-tailwindcss
+
+PackageName: postcss
+SPDXID: SPDXRef-Package-postcss
+PackageVersion: 8.4.40
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-postcss
+
+PackageName: autoprefixer
+SPDXID: SPDXRef-Package-autoprefixer
+PackageVersion: 10.4.19
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-autoprefixer
+
+PackageName: vitest
+SPDXID: SPDXRef-Package-vitest
+PackageVersion: 2.0.5
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-vitest
+
+PackageName: vitejs-plugin-react
+SPDXID: SPDXRef-Package-vitejs-plugin-react
+PackageVersion: 4.3.1
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: npm 패키지명 @vitejs/plugin-react, devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-vitejs-plugin-react
+
+PackageName: testing-library-react
+SPDXID: SPDXRef-Package-testing-library-react
+PackageVersion: 16.0.0
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: npm 패키지명 @testing-library/react, devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-testing-library-react
+
+PackageName: testing-library-jest-dom
+SPDXID: SPDXRef-Package-testing-library-jest-dom
+PackageVersion: 6.4.8
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: npm 패키지명 @testing-library/jest-dom, devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-testing-library-jest-dom
+
+PackageName: testing-library-user-event
+SPDXID: SPDXRef-Package-testing-library-user-event
+PackageVersion: 14.5.2
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: npm 패키지명 @testing-library/user-event, devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-testing-library-user-event
+
+PackageName: jsdom
+SPDXID: SPDXRef-Package-jsdom
+PackageVersion: 24.1.1
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-jsdom
+
+PackageName: fast-check
+SPDXID: SPDXRef-Package-fast-check
+PackageVersion: 3.20.0
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: devDependency
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-fast-check
+
+PackageName: types-node-and-others
+SPDXID: SPDXRef-Package-types-node-and-others
+PackageVersion: various (see package.json: @types/react 18.3.3, @types/react-dom 18.3.0, @types/node 20.14.0, @types/react-window 1.8.8)
+PackageDownloadLocation: NOASSERTION
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageComment: 타입 선언 전용 devDependency 4종을 편의상 하나로 묶어 표기. 상세본은 sbom-2026-08-20.cdx.json 참고
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-types-node-and-others

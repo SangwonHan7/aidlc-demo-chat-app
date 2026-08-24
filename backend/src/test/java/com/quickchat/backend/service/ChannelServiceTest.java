@@ -36,7 +36,7 @@ class ChannelServiceTest {
     @BeforeEach
     void setUp() {
         channelService = new ChannelService(channelRepository, memberRepository, membershipCache);
-        when(channelRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        lenient().when(channelRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @Test
@@ -60,6 +60,19 @@ class ChannelServiceTest {
 
         assertThatThrownBy(() -> channelService.joinChannel(channelId, userId))
                 .isInstanceOf(AlreadyMemberException.class);
+    }
+
+    @Test
+    void joiningInviteOnlyChannelWithoutInviteThrowsForbidden() {
+        UUID channelId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        Channel channel = new Channel("private-room", ChannelType.GROUP, ChannelVisibility.INVITE_ONLY, UUID.randomUUID());
+        when(channelRepository.findById(channelId)).thenReturn(java.util.Optional.of(channel));
+
+        assertThatThrownBy(() -> channelService.joinChannel(channelId, userId))
+                .isInstanceOf(ForbiddenActionException.class);
+
+        verify(memberRepository, never()).save(any());
     }
 
     @Test

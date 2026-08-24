@@ -37,7 +37,10 @@ class MessagingServicePropertyTest {
             store.add(m);
             return m;
         });
-        when(repo.findPage(any(), any(), any())).thenAnswer(inv -> {
+        // getMessageHistory(channelId, null, 10)을 호출하므로(cursor 없음) findByChannelIdOrderBySentAtDesc
+        // 경로로 위임된다 - MessageRepository.java 2026-08-22 수정(PostgreSQL null 파라미터 타입 추론
+        // 문제 회피를 위해 null/non-null cursor를 별도 쿼리 메서드로 분리) 참고.
+        when(repo.findByChannelIdOrderBySentAtDesc(any(), any())).thenAnswer(inv -> {
             UUID channelId = inv.getArgument(0);
             return store.stream()
                     .filter(m -> m.getChannelId().equals(channelId))

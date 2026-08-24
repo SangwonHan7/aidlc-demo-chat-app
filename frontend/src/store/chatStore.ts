@@ -24,6 +24,10 @@ export function prependHistoryPage(existing: ChatMessage[], page: ChatMessage[])
   return [...newOnes, ...existing].sort((a, b) => a.sentAt.localeCompare(b.sentAt));
 }
 
+// 새로고침 시 어떤 채널을 보고 있었는지 복원하기 위한 키. authStore.ts의 토큰 저장 패턴과 동일하게
+// 순수 localStorage 호출로 구현한다(Zustand persist 미들웨어 미사용 - 기존 코드베이스 관례를 따름).
+const ACTIVE_CHANNEL_KEY = "quickchat.activeChannelId";
+
 interface ChatState {
   channels: Channel[];
   discoverableChannels: Channel[];
@@ -31,6 +35,7 @@ interface ChatState {
   messagesByChannel: Record<string, ChatMessage[]>;
   nextCursorByChannel: Record<string, string | null>;
   setActiveChannel: (channelId: string) => void;
+  restoreActiveChannel: () => void;
   loadChannels: () => Promise<void>;
   loadDiscoverableChannels: () => Promise<void>;
   loadHistory: (channelId: string) => Promise<void>;
@@ -51,7 +56,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
   messagesByChannel: {},
   nextCursorByChannel: {},
 
-  setActiveChannel: (channelId) => set({ activeChannelId: channelId }),
+  setActiveChannel: (channelId) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(ACTIVE_CHANNEL_KEY, channelId);
+    }
+    set({ activeChannelId: channelId });
+  },
+
+  // 새로고침 시 채팅 내역이 사라지는 문제(2026-08-21 사용자 발견)에 대한 수정: 새로고침하면
+  // Zustand 상태(activeChannelId/messagesByChannel)가 전부 초기화되어, 채널을 다시 클릭하기 전까지는
+  // 화면에 아무 대화도 안 보였다. AppShellLayout 부트스트랩이 loadChannels() 완료 후 이 함수를 호출해
+  // 마지막으로 보던 채널 id를 복원한다 - 그 채널이 여전히(멤버십 유지 등) 로드된 채널 목록에 있을 때만
+  // 복원하고, 아니면(제외/삭제됨) 저장된 값을 지운다. activeChannelId가 세팅되면 ConversationView의
+  // 기존 useEffect가 loadHistory()를 호출해 서버에 남아있는 실제 메시지 이력을 다시 불러온다 - 메시지를
+  // 브라우저에 캐시하는 것이 아니라, "새로고침 후에도 같은 대화로 자동 복귀"하는 방식.
+  restoreActiveChannel: () => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(ACTIVE_CHANNEL_KEY);
+    if (!stored) return;
+    const exists = get().channels.some((c) => c.id === stored);
+    if (exists) {
+      set({ activeChannelId: stored });
+    } else {
+      window.localStorage.removeItem(ACTIVE_CHANNEL_KEY);
+    }
+  },
 
   loadChannels: async () => {
     const { data } = await apiClient.get<Channel[]>("/api/channels");
@@ -130,12 +159,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // AppShellLayout 로그아웃 경로에서 호출 - 같은 브라우저 탭에서 다른 사용자가 다시 로그인할 때
   // 이전 사용자의 채널/메시지가 잔류해 보이는 것을 방지한다.
-  reset: () =>
+  reset: () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(ACTIVE_CHANNEL_KEY);
+    }
     set({
       channels: [],
       discoverableChannels: [],
       activeChannelId: null,
       messagesByChannel: {},
       nextCursorByChannel: {},
-    }),
+    });
+  },
 }));

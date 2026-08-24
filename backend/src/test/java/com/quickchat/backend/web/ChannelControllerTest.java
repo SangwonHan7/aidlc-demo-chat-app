@@ -2,6 +2,7 @@ package com.quickchat.backend.web;
 
 import com.quickchat.backend.domain.ChannelMember;
 import com.quickchat.backend.domain.ChannelRole;
+import com.quickchat.backend.security.JwtTokenProvider;
 import com.quickchat.backend.service.ChannelService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ class ChannelControllerTest {
 
     @MockBean
     private ChannelService channelService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     void listDiscoverableReturnsPublicChannelsRegardlessOfMembership() throws Exception {

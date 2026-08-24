@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  */
 class AuthServicePropertyTest {
 
-    @Property
+    @Property(tries = 30)
     @Label("register 직후 동일한 비밀번호로 login이 항상 성공한다 (round-trip)")
     void registerThenLoginRoundTrip(@ForAll("validEmails") String email,
                                      @ForAll("validPasswords") String password,
@@ -46,7 +46,7 @@ class AuthServicePropertyTest {
                 new JwtTokenProvider("property-test-secret-key-32-bytes-minimum-len", 15);
 
         AuthService authService = new AuthService(
-                userRepository, new BCryptPasswordEncoder(), loginLock, refreshTokens, jwtTokenProvider);
+                userRepository, new BCryptPasswordEncoder(4), loginLock, refreshTokens, jwtTokenProvider);
 
         authService.register(email, password, displayName);
         TokenPair tokens = authService.login(email, password);
@@ -63,7 +63,7 @@ class AuthServicePropertyTest {
 
     @Provide
     Arbitrary<String> validPasswords() {
-        return Arbitraries.strings().withCharRange('a', 'z').numericChars().ofMinLength(8).ofMaxLength(30);
+        return Arbitraries.strings().withCharRange('a', 'z').numeric().ofMinLength(8).ofMaxLength(30);
     }
 
     @Provide

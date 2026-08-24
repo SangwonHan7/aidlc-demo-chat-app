@@ -21,18 +21,26 @@ describe("LoginForm (property-based) - error banner presence must match isValidE
   it("shows the email-format error iff isValidEmail(value) is false", async () => {
     await fc.assert(
       fc.asyncProperty(fc.string({ maxLength: 60 }), async (value) => {
-        render(<LoginForm />);
-        fireEvent.change(screen.getByTestId("login-form-email-input"), { target: { value } });
-        fireEvent.click(screen.getByTestId("login-form-submit-button"));
-
-        if (isValidEmail(value)) {
-          await waitFor(() => expect(screen.queryByTestId("login-form-error")).toBeNull());
-        } else {
-          await waitFor(() =>
-            expect(screen.getByTestId("login-form-error")).toHaveTextContent("올바른 이메일 형식")
-          );
-        }
+        // cleanup()을 성공 경로 끝에서만 호출하면, 한 iteration의 assert가 실패해 예외가 던져질 때
+        // cleanup을 건너뛰어 DOM에 이전 render()가 남는다 - 다음 iteration이 같은 data-testid를 둘
+        // 찾아내는 "Found multiple elements" 2차 오류로 원래 실패 원인을 가려버린다(2026-08-21 npm test
+        // 로그에서 실제로 관찰됨). try/finally로 성공/실패 모두 매 iteration 시작 전에 정리되도록 한다.
         cleanup();
+        try {
+          render(<LoginForm />);
+          fireEvent.change(screen.getByTestId("login-form-email-input"), { target: { value } });
+          fireEvent.click(screen.getByTestId("login-form-submit-button"));
+
+          if (isValidEmail(value)) {
+            await waitFor(() => expect(screen.queryByTestId("login-form-error")).toBeNull());
+          } else {
+            await waitFor(() =>
+              expect(screen.getByTestId("login-form-error")).toHaveTextContent("올바른 이메일 형식")
+            );
+          }
+        } finally {
+          cleanup();
+        }
       }),
       { numRuns: 25 }
     );

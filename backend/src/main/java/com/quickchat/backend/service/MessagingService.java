@@ -45,10 +45,17 @@ public class MessagingService {
         return messageRepository.save(message);
     }
 
-    /** Cursor 기반 페이지네이션, 최신순. business-rules.md Q5 답변 A. */
+    /**
+     * Cursor 기반 페이지네이션, 최신순. business-rules.md Q5 답변 A.
+     * beforeSentAt이 null이면 최신 페이지, 아니면 그 시각 이전 페이지를 조회한다 - PostgreSQL의 null
+     * 파라미터 타입 추론 문제(MessageRepository.java 참고)를 피하기 위해 두 개의 별도 쿼리로 분기한다.
+     */
     public List<Message> getMessageHistory(UUID channelId, Instant beforeSentAt, int pageSize) {
         int size = pageSize > 0 ? pageSize : DEFAULT_PAGE_SIZE;
-        return messageRepository.findPage(channelId, beforeSentAt, PageRequest.of(0, size));
+        PageRequest page = PageRequest.of(0, size);
+        return beforeSentAt == null
+                ? messageRepository.findByChannelIdOrderBySentAtDesc(channelId, page)
+                : messageRepository.findByChannelIdAndSentAtLessThanOrderBySentAtDesc(channelId, beforeSentAt, page);
     }
 
     /**

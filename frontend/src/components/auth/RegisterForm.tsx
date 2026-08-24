@@ -8,6 +8,7 @@ import { isValidDisplayName, isValidEmail, isValidPassword, passwordStrength } f
 import { messageForErrorCode } from "@/lib/errorMessages";
 import type { ApiError } from "@/types/domain";
 
+/** noValidate 필요 이유: LoginForm.tsx 상단 주석 참고(2026-08-21 npm test에서 동일 원인으로 발견). */
 export function RegisterForm() {
   const router = useRouter();
   const register = useAuthStore((s) => s.register);
@@ -49,7 +50,12 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-4" data-testid="register-form">
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="flex w-full max-w-sm flex-col gap-4"
+      data-testid="register-form"
+    >
       <h1 className="text-xl font-semibold">QuickChat 회원가입</h1>
       <label className="flex flex-col gap-1">
         <span className="text-sm text-gray-600">이메일</span>

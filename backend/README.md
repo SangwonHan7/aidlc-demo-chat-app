@@ -34,6 +34,8 @@ Spring Boot 3 기반 백엔드. 상세 설계는 `../aidlc-docs/construction/bac
 - `GET /api/presence?userIds=` - 온라인 상태 조회, UUID 목록 파라미터 (FR-6, story 1.4)
 - WebSocket(STOMP) `/ws` 엔드포인트, `/app/chat.send/{channelId}`로 전송, `/topic/channel/{channelId}` 구독 (FR-2, FR-5)
   - CONNECT 인증 성공 시 서버가 자동으로 해당 세션을 온라인으로 표시하고, DISCONNECT 시 오프라인으로 표시 (별도 클라이언트 API 호출 불필요)
+  - SUBSCRIBE 시점에 채널 멤버십을 확인한다 - 멤버가 아닌 채널은 구독할 수 없음 (Build and Test 보안 점검 H2 수정)
+  - `/ws`의 허용 origin은 `quickchat.cors.allowed-origin`(REST와 동일한 값)으로 제한됨 (Build and Test 보안 점검 M1 수정)
 - API 문서: `/swagger-ui.html` (springdoc-openapi)
 - 헬스체크/메트릭: `/actuator/health`, `/actuator/prometheus`
 
@@ -41,3 +43,9 @@ Spring Boot 3 기반 백엔드. 상세 설계는 `../aidlc-docs/construction/bac
 
 - `./gradlew test` - JUnit5(예시 기반) + jqwik(속성 기반, PBT) 함께 실행
 - 속성 기반 테스트 대상과 근거: `../aidlc-docs/construction/backend/code/business-logic-summary.md`
+
+## 보안 점검
+
+- `.gstack/security-reports/cso-2026-08-20.md` - Build and Test 단계에서 실행한 전체 보안 점검 보고서(OWASP/ISMS-P/CWE 매핑, SBOM 포함)
+- Gate 판정: BLOCKED(standard 게이트, HIGH 3건 중 2건은 즉시 수정 - 아래 참고, 1건은 프레임워크 버전 관련이라 코드 수정이 아닌 별도 업그레이드 계획 필요) - 상세 조치 계획은 `.gstack/security-reports/risk-acceptance-2026-08-20.md`
+- 즉시 수정한 항목: INVITE_ONLY 채널 무단 자율 참여 차단(`ChannelService.joinChannel`), WebSocket SUBSCRIBE 멤버십 검사 추가, WebSocket CORS를 REST와 동일한 단일 origin으로 제한 - 상세는 `../aidlc-docs/construction/backend/code/api-layer-summary.md`의 "Post-Approval Patch 6"

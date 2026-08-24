@@ -4,7 +4,7 @@
 - Project Name: QuickChat (AI-DLC 데모, 1회차 멘토링용)
 - Project Type: Greenfield
 - Start Date: 2026-08-13T06:36:01Z
-- Current Stage: CONSTRUCTION - Frontend Unit - Code Generation 완료, 사용자 승인 대기 (Gate)
+- Current Stage: Build and Test 승인 완료 - AI-DLC 워크플로우 정의상 마지막 단계(OPERATIONS는 이 프로젝트 규칙상 placeholder, `.aidlc-rule-details/operations/operations.md`: "The AI-DLC workflow currently ends after the Build and Test phase in CONSTRUCTION"). 남은 작업은 build-and-test-summary.md의 "Next Steps"(실제 빌드/테스트 최초 실행, 보안 재점검)로, 게이트가 있는 AI-DLC 단계가 아니라 통상적인 개발/배포 준비 작업으로 인계됨
 
 ## Workspace State
 - Existing Code: No
@@ -54,7 +54,19 @@
 - Patch 2: CORS (`SecurityConfig` CorsConfigurationSource, `CORS_ALLOWED_ORIGIN`)
 - Patch 3: 채널 멤버 목록/사용자 조회·검색/공개 채널 발견 API (`GET /api/channels/{id}/members`, `GET /api/users`, `GET /api/users/search`, `GET /api/channels/discoverable`)
 - Patch 4: 내 프로필 조회 API (`GET /api/users/me`)
+- Patch 5: WebSocket 브로드캐스트 필드명 버그 수정(`messageId`→`id`, 계약 감사에서 발견)
+- Patch 6: 보안 점검 HIGH 2건/MEDIUM 1건 수정(채널 join 가시성 검증, WebSocket SUBSCRIBE 인가, WebSocket CORS 단일 origin 제한)
 - 상세: `aidlc-docs/construction/backend/code/api-layer-summary.md`
 
 ### CONSTRUCTION PHASE - Build and Test
-- [ ] Build and Test (모든 유닛 완료 후)
+- [x] 계약 감사(정적, 실제 실행) - REST/에러 전부 일치, WebSocket 필드명 결함 1건 발견 후 즉시 수정(Patch 5)
+- [x] 보안 점검(source-code-security-check 스킬, 실제 실행) - 최초 BLOCKED(HIGH 3) → HIGH 2건+MEDIUM 1건 즉시 수정(Patch 6) → 2026-08-21 재실행으로 **Deploy Gate PASS 확정**(standard 게이트, HIGH 1건(H3)만 남음). 결과: `.gstack/security-reports/cso-2026-08-20*`, `.gstack/security-reports/cso-2026-08-21*`
+- [x] Build/Unit/Integration/Performance/E2E 지침 문서 8종 작성 (`aidlc-docs/construction/build-and-test/`)
+- [ ] 위 지침의 실제 실행(Not Run) - `mcp__workspace__bash` 샌드박스 `VM_DISK_SPACE_INSUFFICIENT`로 이번 세션 내내 불가. build-and-test-summary.md에 Next Steps로 명시
+- [x] 사용자 승인 완료 ("계속 해줘")
+
+### OPERATIONS PHASE
+- Placeholder 단계 (`.aidlc-rule-details/operations/operations.md`) - 이 프로젝트에 정의된 AI-DLC 게이트 워크플로우는 Build and Test 승인으로 종료됨
+- 실제로 남은 작업(게이트/승인 대상 아님, 통상적인 엔지니어링 후속 작업): build-and-test-summary.md의 Next Steps 5개 중
+  - [x] (4) 보안 점검 재실행으로 게이트 PASS 확정 - 2026-08-21 완료, standard 게이트 PASS
+  - [ ] (1) 최초 실제 빌드, (2) 단위 테스트 실행, (3) WebSocket 관련 통합 테스트(Patch 5/6 회귀 확인), (5) 통과 후 실제 배포 - `mcp__workspace__bash` 샌드박스 `VM_DISK_SPACE_INSUFFICIENT`로 계속 불가, 사용자 로컬 실행 또는 샌드박스 복구 대기

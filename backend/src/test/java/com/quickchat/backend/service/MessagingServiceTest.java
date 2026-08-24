@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,11 +58,27 @@ class MessagingServiceTest {
     }
 
     @Test
-    void getMessageHistoryDelegatesToRepositoryWithDefaultPageSize() {
+    void getMessageHistoryWithNoCursorDelegatesToLatestPageQuery() {
         UUID channelId = UUID.randomUUID();
         messagingService.getMessageHistory(channelId, null, 0);
 
-        verify(messageRepository).findPage(eq(channelId), isNull(),
+        // 2026-08-22 발견: beforeSentAt이 null일 때 단일 JPQL(:beforeSentAt is null or ...)로
+        // 처리하면 PostgreSQL이 null 파라미터의 타입을 추론하지 못해 500(SQLState 42P18)이 났다.
+        // null 케이스는 별도 쿼리 메서드로 위임해야 한다 - MessageRepository.java 참고.
+        verify(messageRepository).findByChannelIdOrderBySentAtDesc(eq(channelId),
                 argThat(pageable -> pageable.getPageSize() == 50));
+        verify(messageRepository, never())
+                .findByChannelIdAndSentAtLessThanOrderBySentAtDesc(any(), any(), any());
+    }
+
+    @Test
+    void getMessageHistoryWithCursorDelegatesToBeforeQuery() {
+        UUID channelId = UUID.randomUUID();
+        Instant before = Instant.parse("2026-08-22T00:00:00Z");
+        messagingService.getMessageHistory(channelId, before, 20);
+
+        verify(messageRepository).findByChannelIdAndSentAtLessThanOrderBySentAtDesc(
+                eq(channelId), eq(before), argThat(pageable -> pageable.getPageSize() == 20));
+        verify(messageRepository, never()).findByChannelIdOrderBySentAtDesc(any(), any());
     }
 }

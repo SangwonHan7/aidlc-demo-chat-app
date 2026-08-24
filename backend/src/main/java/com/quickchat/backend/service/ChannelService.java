@@ -68,10 +68,19 @@ public class ChannelService {
         return created;
     }
 
-    /** PUBLIC 채널 자율 참여. 이미 멤버면 ALREADY_MEMBER (business-rules.md Q4 답변 A). */
+    /**
+     * PUBLIC 채널 자율 참여. 이미 멤버면 ALREADY_MEMBER (business-rules.md Q4 답변 A).
+     * Build and Test 보안 점검(H1)에서 발견: 이 메서드가 channel.getVisibility()를 전혀 확인하지 않아,
+     * INVITE_ONLY 채널(그룹이든 DIRECT든)의 UUID만 알면 초대 없이 누구나 스스로 참여할 수 있었다 - 이미
+     * 승인된 규칙("초대 전용 채널은 초대를 받아야 참여할 수 있다", stories.md Story 1.3/2.1)을 위반하는
+     * 구현 결함이라 판단해 직접 수정했다.
+     */
     @Transactional
     public void joinChannel(UUID channelId, UUID userId) {
         Channel channel = getChannelOrThrow(channelId);
+        if (channel.getVisibility() != ChannelVisibility.PUBLIC) {
+            throw new ForbiddenActionException();
+        }
         requireNotAlreadyMember(channelId, userId);
         memberRepository.save(new ChannelMember(channelId, userId, ChannelRole.MEMBER));
         membershipCache.cacheMember(channelId, userId);

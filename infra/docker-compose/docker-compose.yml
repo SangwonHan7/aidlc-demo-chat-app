@@ -2,8 +2,6 @@
 # 참고: aidlc-docs/construction/backend/infrastructure-design/deployment-architecture.md
 # 현재 NAS(Synology DS925+)는 RAM 20GB로 k3s 운영이 권장되지만, 로컬 개발 편의를 위해 이 파일도 유지한다.
 
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -21,8 +19,14 @@ services:
     ports:
       - "6379:6379"
 
+  # 2025-08-28부로 Bitnami가 무료 카탈로그(docker.io/bitnami/*)의 기존 이미지를 전부
+  # docker.io/bitnamilegacy/*로 이전했다 - bitnami/kafka:3.7은 더 이상 존재하지 않아 "manifest unknown"
+  # 오류가 난다(2026-08-21 사용자 인프라 실행 중 실제 발견). bitnamilegacy 저장소는 더 이상 업데이트되지
+  # 않는 임시 이전용 스냅샷이라는 경고가 있지만, 태그/환경변수 스킴(KAFKA_CFG_*)이 완전히 동일해 이번
+  # 데모 범위에서는 가장 리스크가 적은 수정이다. 장기적으로는 공식 apache/kafka 이미지로 옮기는 것을
+  # 고려할 수 있으나 KAFKA_CFG_* -> KAFKA_* 환경변수 전면 재작성이 필요해 이번 라운드 범위를 벗어난다.
   kafka:
-    image: bitnami/kafka:3.7
+    image: bitnamilegacy/kafka:3.7
     environment:
       KAFKA_CFG_NODE_ID: "1"
       KAFKA_CFG_PROCESS_ROLES: broker,controller

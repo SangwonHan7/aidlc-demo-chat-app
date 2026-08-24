@@ -1,0 +1,102 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:5f3f0e0a-8b1a-4c2e-9d3a-quickchat20260820",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-20T00:00:00+09:00",
+    "tools": [
+      {"name": "cso-skill", "version": "4.0.2"}
+    ],
+    "component": {
+      "type": "application",
+      "name": "quickchat",
+      "version": "0.1.0 (backend) / 0.1.0 (frontend)"
+    },
+    "properties": [
+      {
+        "name": "cso:scope-note",
+        "value": "직접(direct) 선언 의존성만 포함합니다. backend/build.gradle과 frontend/package.json에 명시된 항목 기준이며, 전이(transitive) 의존성은 실제 Gradle/npm 의존성 리졸버를 실행하지 않고는 정확히 열거할 수 없어 이 SBOM에는 포함하지 않았습니다 (근거: package-lock.json / gradle.lockfile 등 lock 파일이 저장소에 존재하지 않음 - M6 참고). 존재하지 않는 전이 트리를 추정해 채우지 않고 이 한계를 명시하는 쪽을 선택했습니다."
+      },
+      {
+        "name": "cso:hash-note",
+        "value": "각 구성요소의 실제 아티팩트를 다운로드/빌드하지 않았으므로 SHA-256 해시는 계산할 수 없습니다. 허위 해시값을 기재하지 않기 위해 hashes 필드를 의도적으로 생략했습니다."
+      },
+      {
+        "name": "cso:version-note",
+        "value": "spring-kafka, flyway-core, flyway-database-postgresql, micrometer-registry-prometheus, org.postgresql:postgresql 은 build.gradle에 버전이 직접 고정되지 않고 Spring Boot 3.3.2의 dependency-management BOM이 관리합니다. 실제 Gradle 실행 없이는 정확한 resolved 버전을 확정할 수 없어 version 필드에 'bom-managed(spring-boot-3.3.2)'로 표기했습니다."
+      }
+    ]
+  },
+  "components": [
+    {"type": "library", "name": "spring-boot-starter-web", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-websocket", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-websocket@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-security", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-security@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-data-jpa", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-jpa@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-data-redis", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-redis@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-actuator", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-actuator@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-boot-starter-validation", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-validation@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "spring-kafka", "group": "org.springframework.kafka", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.springframework.kafka/spring-kafka", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "flyway-core", "group": "org.flywaydb", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.flywaydb/flyway-core", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "flyway-database-postgresql", "group": "org.flywaydb", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.flywaydb/flyway-database-postgresql", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "micrometer-registry-prometheus", "group": "io.micrometer", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/io.micrometer/micrometer-registry-prometheus", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "jjwt-api", "group": "io.jsonwebtoken", "version": "0.12.6", "purl": "pkg:maven/io.jsonwebtoken/jjwt-api@0.12.6", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "jjwt-impl", "group": "io.jsonwebtoken", "version": "0.12.6", "purl": "pkg:maven/io.jsonwebtoken/jjwt-impl@0.12.6", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "jjwt-jackson", "group": "io.jsonwebtoken", "version": "0.12.6", "purl": "pkg:maven/io.jsonwebtoken/jjwt-jackson@0.12.6", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "springdoc-openapi-starter-webmvc-ui", "group": "org.springdoc", "version": "2.6.0", "purl": "pkg:maven/org.springdoc/springdoc-openapi-starter-webmvc-ui@2.6.0", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required"},
+    {"type": "library", "name": "postgresql", "group": "org.postgresql", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.postgresql/postgresql", "licenses": [{"license": {"id": "BSD-2-Clause"}}], "scope": "required"},
+    {"type": "library", "name": "lombok", "group": "org.projectlombok", "version": "1.18.34", "purl": "pkg:maven/org.projectlombok/lombok@1.18.34", "licenses": [{"license": {"id": "MIT"}}], "scope": "excluded", "description": "compileOnly/annotationProcessor — not present in runtime jar"},
+    {"type": "library", "name": "spring-boot-starter-test", "group": "org.springframework.boot", "version": "3.3.2", "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.3.2", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "optional", "description": "testImplementation only"},
+    {"type": "library", "name": "spring-security-test", "group": "org.springframework.security", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.springframework.security/spring-security-test", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "optional", "description": "testImplementation only"},
+    {"type": "library", "name": "spring-kafka-test", "group": "org.springframework.kafka", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.springframework.kafka/spring-kafka-test", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "optional", "description": "testImplementation only"},
+    {"type": "library", "name": "jqwik", "group": "net.jqwik", "version": "1.8.5", "purl": "pkg:maven/net.jqwik/jqwik@1.8.5", "licenses": [{"license": {"id": "EPL-2.0"}}], "scope": "optional", "description": "testImplementation only, weak copyleft but not distributed"},
+    {"type": "library", "name": "junit-platform-launcher", "group": "org.junit.platform", "version": "bom-managed(spring-boot-3.3.2)", "purl": "pkg:maven/org.junit.platform/junit-platform-launcher", "licenses": [{"license": {"id": "EPL-2.0"}}], "scope": "optional", "description": "testRuntimeOnly, not distributed"},
+
+    {"type": "library", "name": "next", "version": "14.2.5", "purl": "pkg:npm/next@14.2.5", "licenses": [{"license": {"id": "MIT"}}], "scope": "required"},
+    {"type": "library", "name": "react", "version": "18.3.1", "purl": "pkg:npm/react@18.3.1", "licenses": [{"license": {"id": "MIT"}}], "scope": "required", "description": "declared ^18.3.1"},
+    {"type": "library", "name": "react-dom", "version": "18.3.1", "purl": "pkg:npm/react-dom@18.3.1", "licenses": [{"license": {"id": "MIT"}}], "scope": "required", "description": "declared ^18.3.1"},
+    {"type": "library", "name": "zustand", "version": "4.5.4", "purl": "pkg:npm/zustand@4.5.4", "licenses": [{"license": {"id": "MIT"}}], "scope": "required", "description": "declared ^4.5.4"},
+    {"type": "library", "name": "axios", "version": "1.7.4", "purl": "pkg:npm/axios@1.7.4", "licenses": [{"license": {"id": "MIT"}}], "scope": "required", "description": "declared ^1.7.4 (caret range; actual resolved version unverifiable without lockfile, see M6)"},
+    {"type": "library", "name": "@stomp/stompjs", "version": "7.0.0", "purl": "pkg:npm/%40stomp/stompjs@7.0.0", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "required", "description": "declared ^7.0.0"},
+    {"type": "library", "name": "react-window", "version": "1.8.10", "purl": "pkg:npm/react-window@1.8.10", "licenses": [{"license": {"id": "MIT"}}], "scope": "required", "description": "declared ^1.8.10"},
+
+    {"type": "library", "name": "typescript", "version": "5.5.4", "purl": "pkg:npm/typescript@5.5.4", "licenses": [{"license": {"id": "Apache-2.0"}}], "scope": "optional", "description": "devDependency; shipped into runtime image due to L8 (no npm prune)"},
+    {"type": "library", "name": "@types/react", "version": "18.3.3", "purl": "pkg:npm/%40types/react@18.3.3", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@types/react-dom", "version": "18.3.0", "purl": "pkg:npm/%40types/react-dom@18.3.0", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@types/node", "version": "20.14.0", "purl": "pkg:npm/%40types/node@20.14.0", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@types/react-window", "version": "1.8.8", "purl": "pkg:npm/%40types/react-window@1.8.8", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "tailwindcss", "version": "3.4.7", "purl": "pkg:npm/tailwindcss@3.4.7", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "postcss", "version": "8.4.40", "purl": "pkg:npm/postcss@8.4.40", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "autoprefixer", "version": "10.4.19", "purl": "pkg:npm/autoprefixer@10.4.19", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "vitest", "version": "2.0.5", "purl": "pkg:npm/vitest@2.0.5", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@vitejs/plugin-react", "version": "4.3.1", "purl": "pkg:npm/%40vitejs/plugin-react@4.3.1", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@testing-library/react", "version": "16.0.0", "purl": "pkg:npm/%40testing-library/react@16.0.0", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@testing-library/jest-dom", "version": "6.4.8", "purl": "pkg:npm/%40testing-library/jest-dom@6.4.8", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "@testing-library/user-event", "version": "14.5.2", "purl": "pkg:npm/%40testing-library/user-event@14.5.2", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "jsdom", "version": "24.1.1", "purl": "pkg:npm/jsdom@24.1.1", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"},
+    {"type": "library", "name": "fast-check", "version": "3.20.0", "purl": "pkg:npm/fast-check@3.20.0", "licenses": [{"license": {"id": "MIT"}}], "scope": "optional"}
+  ],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2025-27152",
+      "description": "axios가 baseURL 설정 시에도 절대 URL 요청을 그대로 전송해 SSRF 및 자격증명 유출이 가능. affects axios <1.8.2.",
+      "affects": [{"ref": "pkg:npm/axios@1.7.4"}],
+      "ratings": [{"source": {"name": "GHSA-jr5f-v2jv-69x6"}, "severity": "high", "score": 7.7}],
+      "recommendation": "axios를 1.8.2 이상으로 업그레이드. 이 코드베이스에서는 절대 URL을 axios에 전달하는 호출 패턴이 발견되지 않아 현재 시점 실증 익스플로잇 경로는 미확인 (M3 참고)."
+    },
+    {
+      "id": "CVE-2025-58754",
+      "description": "axios가 Node.js에서 data: 스킴 URL을 전체 메모리로 디코딩해 반환, DoS 가능.",
+      "affects": [{"ref": "pkg:npm/axios@1.7.4"}],
+      "ratings": [{"source": {"name": "GHSA (axios)"}, "severity": "high", "score": 7.5}],
+      "recommendation": "axios 최신 1.x로 업그레이드. 이 앱은 data: URL을 요청하는 코드 경로가 없음(M3 참고)."
+    },
+    {
+      "id": "CVE-2025-29927",
+      "description": "Next.js Middleware가 x-middleware-subrequest 헤더를 신뢰해 인가 우회 가능. affects Next.js <14.2.25 (14.x 라인).",
+      "affects": [{"ref": "pkg:npm/next@14.2.5"}],
+      "ratings": [{"source": {"name": "GHSA-f82v-jwr5-mffw"}, "severity": "critical", "score": 9.1}],
+      "recommendation": "이 프로젝트는 middleware.ts를 사용하지 않아(Glob으로 확인) 이 취약점의 실제 공격 경로가 적용되지 않는 것으로 판단됨(M4 참고, 과장 방지를 위해 명시). 그럼에도 14.2.35 이상으로 업그레이드 권고."
+    }
+  ]
+}

@@ -46,4 +46,5 @@ tasks.named('test') {
     useJUnitPlatform {
         includeEngines 'jqwik', 'junit-jupiter'
     }
+    timeout = Duration.ofMinutes(10)
 }

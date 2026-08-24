@@ -26,26 +26,33 @@ describe("RegisterForm (property-based) - error banner presence must match valid
   it("shows the password error iff isValidPassword(value) is false (email/displayName fixed valid)", async () => {
     await fc.assert(
       fc.asyncProperty(fc.string({ maxLength: 120 }), async (password) => {
-        render(<RegisterForm />);
-        fireEvent.change(screen.getByTestId("register-form-email-input"), {
-          target: { value: VALID_EMAIL },
-        });
-        fireEvent.change(screen.getByTestId("register-form-password-input"), {
-          target: { value: password },
-        });
-        fireEvent.change(screen.getByTestId("register-form-display-name-input"), {
-          target: { value: VALID_DISPLAY_NAME },
-        });
-        fireEvent.click(screen.getByTestId("register-form-submit-button"));
-
-        if (isValidPassword(password)) {
-          await waitFor(() => expect(screen.queryByTestId("register-form-error")).toBeNull());
-        } else {
-          await waitFor(() =>
-            expect(screen.getByTestId("register-form-error")).toHaveTextContent("8자 이상")
-          );
-        }
+        // cleanup()을 성공 경로 끝에서만 부르면 실패 시 DOM이 남아 다음 iteration이 원인을 알 수 없는
+        // "multiple elements" 오류로 가려진다(LoginForm.property.test.tsx에서 실제 관찰됨) - 매
+        // iteration 시작 전 정리 + try/finally로 성공/실패 모두 정리되게 한다.
         cleanup();
+        try {
+          render(<RegisterForm />);
+          fireEvent.change(screen.getByTestId("register-form-email-input"), {
+            target: { value: VALID_EMAIL },
+          });
+          fireEvent.change(screen.getByTestId("register-form-password-input"), {
+            target: { value: password },
+          });
+          fireEvent.change(screen.getByTestId("register-form-display-name-input"), {
+            target: { value: VALID_DISPLAY_NAME },
+          });
+          fireEvent.click(screen.getByTestId("register-form-submit-button"));
+
+          if (isValidPassword(password)) {
+            await waitFor(() => expect(screen.queryByTestId("register-form-error")).toBeNull());
+          } else {
+            await waitFor(() =>
+              expect(screen.getByTestId("register-form-error")).toHaveTextContent("8자 이상")
+            );
+          }
+        } finally {
+          cleanup();
+        }
       }),
       { numRuns: 25 }
     );
@@ -54,26 +61,30 @@ describe("RegisterForm (property-based) - error banner presence must match valid
   it("shows the display-name error iff isValidDisplayName(value) is false (email/password fixed valid)", async () => {
     await fc.assert(
       fc.asyncProperty(fc.string({ maxLength: 60 }), async (displayName) => {
-        render(<RegisterForm />);
-        fireEvent.change(screen.getByTestId("register-form-email-input"), {
-          target: { value: VALID_EMAIL },
-        });
-        fireEvent.change(screen.getByTestId("register-form-password-input"), {
-          target: { value: VALID_PASSWORD },
-        });
-        fireEvent.change(screen.getByTestId("register-form-display-name-input"), {
-          target: { value: displayName },
-        });
-        fireEvent.click(screen.getByTestId("register-form-submit-button"));
-
-        if (isValidDisplayName(displayName)) {
-          await waitFor(() => expect(screen.queryByTestId("register-form-error")).toBeNull());
-        } else {
-          await waitFor(() =>
-            expect(screen.getByTestId("register-form-error")).toHaveTextContent("표시 이름")
-          );
-        }
         cleanup();
+        try {
+          render(<RegisterForm />);
+          fireEvent.change(screen.getByTestId("register-form-email-input"), {
+            target: { value: VALID_EMAIL },
+          });
+          fireEvent.change(screen.getByTestId("register-form-password-input"), {
+            target: { value: VALID_PASSWORD },
+          });
+          fireEvent.change(screen.getByTestId("register-form-display-name-input"), {
+            target: { value: displayName },
+          });
+          fireEvent.click(screen.getByTestId("register-form-submit-button"));
+
+          if (isValidDisplayName(displayName)) {
+            await waitFor(() => expect(screen.queryByTestId("register-form-error")).toBeNull());
+          } else {
+            await waitFor(() =>
+              expect(screen.getByTestId("register-form-error")).toHaveTextContent("표시 이름")
+            );
+          }
+        } finally {
+          cleanup();
+        }
       }),
       { numRuns: 25 }
     );

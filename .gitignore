@@ -1,0 +1,56 @@
+# ============================================================
+# QuickChat - 루트 .gitignore (Backend: Gradle/Spring Boot, Frontend: Next.js)
+# ============================================================
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- IDE ----
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+
+# ============================================================
+# Backend (Gradle / Spring Boot)
+# ============================================================
+backend/.gradle/
+backend/build/
+backend/out/
+backend/bin/
+backend/.jqwik-database
+*.class
+!backend/gradle/wrapper/gradle-wrapper.jar
+
+# ============================================================
+# Frontend (Next.js / Node)
+# ============================================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+frontend/next-env.d.ts
+frontend/*.tsbuildinfo
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# 어느 위치에 생기든 무시 (모노레포 내 다른 곳에서 npm install을 실행한 경우 대비)
+node_modules/
+
+# ---- 환경변수/시크릿 (실수로 실제 값이 커밋되는 것을 방지) ----
+.env
+.env.local
+.env.*.local
+*.pem
+
+# ============================================================
+# 의도적으로 무시하지 않는 것 (참고)
+# ============================================================
+# .gstack/ (보안 점검 보고서/SBOM)는 컴플라이언스 감사 기록이라 의도적으로 추적 대상에 포함함.
+# 필요하면 이 섹션에 추가해 제외할 수 있음.

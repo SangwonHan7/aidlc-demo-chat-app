@@ -1,5 +1,6 @@
 package com.quickchat.backend.web;
 
+import com.quickchat.backend.security.JwtTokenProvider;
 import com.quickchat.backend.service.PresenceService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ class PresenceControllerTest {
 
     @MockBean
     private PresenceService presenceService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     void returnsOnlineStatusForEachRequestedUserId() throws Exception {
