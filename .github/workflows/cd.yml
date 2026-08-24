@@ -123,13 +123,21 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "${{ secrets.NAS_SSH_PORT }}" -H "${{ secrets.NAS_SSH_HOST }}" >> ~/.ssh/known_hosts
 
+      # scp는 최신 OpenSSH 클라이언트에서 기본적으로 SFTP 서브시스템을 통해 전송을 시도하는데,
+      # Synology NAS는 SSH 서비스와 SFTP 서비스가 별개라 SFTP가 꺼져 있으면
+      # "subsystem request failed" / "scp: Connection closed"로 실패한다(실제로 겪은 에러).
+      # SFTP를 켜는 대신, scp/sftp에 의존하지 않는 방식으로 우회 - 로컬 파일을 ssh 명령의 표준입력으로
+      # 흘려보내 원격에서 그대로 파일로 받아쓴다.
       - name: Copy compose files to NAS
         run: |
           ssh -i ~/.ssh/deploy_key -p "${{ secrets.NAS_SSH_PORT }}" \
             "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}" "mkdir -p ~/quickchat-deploy"
-          scp -i ~/.ssh/deploy_key -P "${{ secrets.NAS_SSH_PORT }}" \
-            infra/docker-compose/docker-compose.yml infra/docker-compose/docker-compose.deploy.yml \
-            "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}:~/quickchat-deploy/"
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.NAS_SSH_PORT }}" \
+            "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}" \
+            "cat > ~/quickchat-deploy/docker-compose.yml" < infra/docker-compose/docker-compose.yml
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.NAS_SSH_PORT }}" \
+            "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}" \
+            "cat > ~/quickchat-deploy/docker-compose.deploy.yml" < infra/docker-compose/docker-compose.deploy.yml
 
       # 배포용 .env(~/quickchat-deploy/.env)는 NAS에서 최초 1회 수동으로 만들어둔 뒤 이 워크플로우가
       # 건드리지 않는다(NAS_HOST 등 실제 값이 들어있어 매번 덮어쓰면 안 됨). 헬스체크는 GitHub

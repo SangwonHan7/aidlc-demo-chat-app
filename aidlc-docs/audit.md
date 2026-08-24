@@ -542,3 +542,15 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 빌드 성공 여부 확인 필요
 
 ---
+
+## Post-Workflow Next Steps - CD 배포 실패 수정 (scp → SFTP 서브시스템 의존 제거)
+
+Timestamp: 2026-08-24T03:15:00Z
+User Input: "copy compose files to NAS 단계에서 에러나 확인해줘 아래는 로그야\nsubsystem request failed on channel 0\nscp: Connection closed"
+AI Response: 이 에러 패턴("subsystem request failed" 직후 "scp: Connection closed")은 최신 OpenSSH 클라이언트(9.0+)의 `scp`가 기본적으로 전통적인 scp/rcp 프로토콜이 아니라 SFTP 서브시스템을 통해 파일을 전송하려고 시도하는 데서 발생하는 전형적 증상으로 판단 - Synology NAS는 "SSH 서비스"(터미널 접속용)와 "SFTP 서비스"(File Services에서 별도로 켜야 함)가 분리되어 있어, SSH만 켜둔 상태라면 SFTP 서브시스템이 없어 이 요청이 실패함. NAS에서 SFTP 서비스를 추가로 켜는 방법도 있으나, 그러면 새로운 서비스를 하나 더 열어야 하는 추가 구성/노출이 생기므로, scp/SFTP 자체에 의존하지 않는 방식으로 우회하는 쪽을 선택 - 이미 같은 job의 "Set up SSH key" 스텝에서 쓰던 것과 동일한 패턴(로컬 파일을 `ssh ... "cat > 경로"`의 표준입력으로 흘려보내기)을 재사용해 `scp` 호출 두 줄을 `ssh` 파이프 두 줄로 교체. 설계 트레이드오프 없이 순수 버그 수정으로 판단해 질문 없이 직접 처리.
+`python3 -c yaml.safe_load`로 `deploy` job의 스텝 구성이 여전히 올바른지 재검증.
+Files Modified:
+- .github/workflows/cd.yml (`Copy compose files to NAS` 스텝을 `scp`에서 `ssh` stdin 파이프 방식으로 교체)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 배포 성공 여부 확인 필요
+
+---
