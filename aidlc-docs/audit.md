@@ -595,3 +595,18 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. 사용자가 `docker compose up --build -d` 재실행 후 postgres가 정상 기동되는지, backend가 정상적으로 연결되는지 확인 필요
 
 ---
+
+## Post-Workflow Next Steps - backend 외부 접속 포트 변경 (8080 → 9000)
+
+Timestamp: 2026-08-24T04:30:00Z
+User Input: (`net::ERR_CONNECTION_RESET` 원인을 NAT 루프백/포트포워딩 미설정 쪽으로 좁혀가는 대화 이후) "8080번 포트는 포워딩할 수 없대. 9000번으로 변경해줘"
+AI Response: 공유기가 8080 포트포워딩을 막아둔 것이 확인되어, backend의 브라우저 노출 포트를 9000으로 바꾸기로 함. 컨테이너 내부 포트(Spring Boot `server.port=8080`)는 바꿀 필요가 없고 - `docker-compose.yml`의 `backend.ports`가 호스트:컨테이너 매핑이라 왼쪽(호스트) 값만 바꾸면 되며, 이는 앞서 postgres 포트를 5432→5433으로 바꿀 때와 동일한 패턴임을 재확인. 이 값이 브라우저가 실제로 호출하는 주소이기도 해서, `grep`으로 저장소 전체에서 "8080"이 나오는 23개 파일을 확인한 뒤 실제로 런타임 동작에 영향을 주는 파일만 선별해 수정 - `frontend/src/lib/apiClient.ts`/`stompClient.ts`의 `"http://localhost:8080"` 기본값은 docker-compose가 항상 build-arg로 덮어쓰므로 그대로 두고(로컬에서 Gradle로 backend를 직접 띄울 때의 기본값 8080과 일치해 오히려 정확함), `backend/application.yml`/`Dockerfile`의 8080도 컨테이너 내부 값이라 변경 불필요로 판단.
+수정: `docker-compose.yml`의 `backend.ports`를 `"8080:8080"` → `"9000:8080"`, `frontend` build-arg의 `NEXT_PUBLIC_API_BASE_URL`/`NEXT_PUBLIC_WS_URL`을 `:9000`으로 변경. `cd.yml`의 frontend build-arg와 `deploy` job 헬스체크(`curl localhost:9000/actuator/health`)도 동일하게 변경, 주석의 "8080/3000" 언급도 정리. `README.md`에 6-6 섹션 신규 추가 - 포트를 또 바꿔야 할 경우 함께 바꿔야 하는 3곳(compose 포트 매핑, 두 곳의 build-arg, 헬스체크)과 공유기 포트포워딩 규칙도 9000으로 등록해야 한다는 점을 명시. 설계 트레이드오프 없는 순수 설정 변경으로 판단해 질문 없이 직접 처리.
+`python3 -c yaml.safe_load`와 `grep`으로 두 파일의 8080/9000 잔존 여부 재검증.
+Files Modified:
+- infra/docker-compose/docker-compose.yml (`backend.ports` 및 frontend build-arg를 9000으로)
+- .github/workflows/cd.yml (frontend build-arg, `deploy` job 헬스체크, 주석을 9000으로)
+- infra/docker-compose/README.md (6-6 섹션 신규 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 설정 변경) - 승인 게이트 없음. 사용자가 공유기에 9000번 포트포워딩(외부 9000 → NAS LAN IP:9000)을 등록하고, `docker compose up --build -d`(frontend는 build-arg가 바뀌었으므로 반드시 재빌드) 재실행 후 실제 접속 확인 필요
+
+---

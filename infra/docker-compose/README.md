@@ -76,7 +76,7 @@ Settings → Secrets and variables → Actions에서:
 - **Variables**: `NAS_HOST`(프론트엔드 이미지 빌드 시 `NEXT_PUBLIC_*`에 baked-in되는 값 - `~/quickchat-deploy/.env`의 `NAS_HOST`와 같은 값을 넣는다. 외부 접속 주소인 `NAS_SSH_HOST`와는 다를 수 있음 - 예를 들어 SSH는 공유기의 외부 포트를 통해 들어오지만, 브라우저가 접속할 주소는 사설 IP인 경우)
 
 ### 6-3. 동작 확인
-`main`에 커밋을 push한 뒤 저장소의 Actions 탭에서 `CD - Build, Push & Deploy` 워크플로우가 `build-backend`/`build-frontend`/`deploy` 3개 job 모두 성공하는지 확인한다. `deploy` job 로그에서 SSH 접속, compose 파일 전달, `docker compose pull/up`, 헬스체크(NAS 자신이 `localhost:8080`/`:3000`으로 확인) 결과를 볼 수 있다.
+`main`에 커밋을 push한 뒤 저장소의 Actions 탭에서 `CD - Build, Push & Deploy` 워크플로우가 `build-backend`/`build-frontend`/`deploy` 3개 job 모두 성공하는지 확인한다. `deploy` job 로그에서 SSH 접속, compose 파일 전달, `docker compose pull/up`, 헬스체크(NAS 자신이 `localhost:9000`/`:3000`으로 확인) 결과를 볼 수 있다.
 
 ### 6-4. 이 방식의 알려진 제약
 - 완전 자동화가 필요 없다면 이 섹션은 건너뛰고 위 1~5단계(수동 `docker compose up --build -d`)만으로도 충분하다.
@@ -102,6 +102,16 @@ docker compose up --build -d
 이후 자동배포가 실행되면 같은 `quickchat` 프로젝트 안에서 backend/frontend만 갈아끼우게 된다.
 
 **NAS에 docker가 아닌 서비스가 이미 그 포트를 쓰고 있는 경우**(예: NAS 자체 PostgreSQL 패키지가 5432를 쓰고 있어 kill해도 다시 떠 있는 경우): docker 컨테이너 쪽 문제가 아니라 포트가 이미 다른 프로세스 소유라 근본적으로 피해야 한다. `docker-compose.yml`의 `postgres` 서비스는 호스트 포트를 `5433:5432`로 바꿔뒀다(컨테이너 내부 포트는 여전히 5432이고 backend는 `postgres:5432`라는 내부 네트워크 주소로 접속하므로 이 변경과 무관하게 동작함 - 5433은 NAS에서 `psql` 등으로 직접 접속하고 싶을 때만 쓰는 포트). redis(6379)/kafka(9092)/vault(8200)도 같은 방식으로 겹치면 왼쪽(호스트) 포트만 다른 값으로 바꾸면 된다.
+
+### 6-6. backend 외부 접속 포트 변경 (8080 → 9000)
+공유기에서 8080번 포트포워딩이 막혀있는 경우가 있다(실제로 겪음 - ISP나 공유기 정책상 특정 포트를 막아두는 경우). `docker-compose.yml`의 `backend` 서비스 호스트 포트를 `9000:8080`으로 바꿔뒀다(컨테이너 내부 포트는 Spring Boot 기본값인 8080 그대로 - `server.port` 등 애플리케이션 쪽은 손대지 않음). 브라우저가 실제로 호출하는 주소가 바뀌는 것이므로 `NEXT_PUBLIC_API_BASE_URL`/`NEXT_PUBLIC_WS_URL` build-arg도 9000으로 함께 맞춰뒀다(`docker-compose.yml`과 `cd.yml` 양쪽 다).
+
+다른 포트로 또 바꿔야 한다면 아래 3곳을 함께 바꿔야 한다(하나만 바꾸면 프론트엔드가 엉뚱한 포트로 API를 호출하게 됨):
+- `docker-compose.yml`의 `backend.ports`(`"9000:8080"`의 왼쪽 값)
+- `docker-compose.yml`과 `.github/workflows/cd.yml` 양쪽의 `NEXT_PUBLIC_API_BASE_URL`/`NEXT_PUBLIC_WS_URL`(build-arg)
+- `.github/workflows/cd.yml`의 `deploy` job 헬스체크(`curl http://localhost:9000/actuator/health`)
+
+공유기 포트포워딩 규칙도 외부 포트 9000 → NAS의 LAN IP, 포트 9000으로 등록해야 한다(내부적으로 8080이 아니라 호스트 쪽에 이미 9000으로 매핑되어 있으므로).
 
 ## 참고: k3s 매니페스트
 `infra/k3s/`에 namespaces/data/app/observability 매니페스트가 이미 작성되어 있다(원래 설계에 따른 k3s 배포 경로). 이번에는 사용하지 않지만, 추후 다중 노드/오토스케일링/롤링 업데이트가 필요해지면 참고할 수 있도록 남겨둔다.
