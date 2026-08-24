@@ -1,0 +1,82 @@
+# PostgreSQL - quickchat-data 네임스페이스
+# 리소스 스펙: aidlc-docs/construction/backend/infrastructure-design/infrastructure-design.md
+#   (request 256Mi/0.25 vCPU, limit 512Mi/0.5 vCPU)
+#
+# 주의: POSTGRES_DB/USER/PASSWORD는 이 파일에 평문으로 넣지 않는다(2026-08-20 보안 점검
+# cso-2026-08-20.md M8 "docker-compose.yml에 평문 자격증명" 발견과 같은 문제를 k3s에서 반복하지
+# 않기 위함). 대신 `postgres-credentials`라는 이름의 Secret을 배포 전에 직접 생성해야 한다
+# (aidlc-docs/construction/backend/infrastructure-design/deployment-architecture.md의 "배포 순서"
+# 및 배포 런북 참고):
+#
+#   kubectl create secret generic postgres-credentials -n quickchat-data \
+#     --from-literal=POSTGRES_DB=quickchat \
+#     --from-literal=POSTGRES_USER=quickchat \
+#     --from-literal=POSTGRES_PASSWORD='<직접 정한 강력한 비밀번호>'
+#
+# 스토리지: 원래 설계는 Synology CSI였으나, 이번 1회차 데모 범위에서는 별도 CSI 드라이버 설치 없이
+# k3s가 기본 제공하는 local-path StorageClass(노드 로컬 디스크)를 사용한다 - 단일 노드 클러스터라
+# 실질적 차이는 없고(어차피 그 VM의 디스크), Synology CSI 드라이버를 별도로 설치/구성하는 작업은
+# 이번 배포 범위 밖으로 명시적으로 미룬다.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: quickchat-data
+  labels:
+    app: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - secretRef:
+                name: postgres-credentials
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "quickchat"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: quickchat-data
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

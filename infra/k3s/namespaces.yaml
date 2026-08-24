@@ -1,0 +1,25 @@
+# QuickChat k3s 배포 - 네임스페이스
+# 참고: aidlc-docs/construction/shared-infrastructure.md, backend/infrastructure-design/infrastructure-design.md (Q6 답변 B)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quickchat-app
+  labels:
+    app.kubernetes.io/part-of: quickchat
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quickchat-data
+  labels:
+    app.kubernetes.io/part-of: quickchat
+---
+# infrastructure-design.md/shared-infrastructure.md는 Prometheus/Grafana를 "클러스터 공용
+# 인프라"로만 언급하고 quickchat-app/quickchat-data 중 어디에 둘지는 정하지 않았다 - 이번 배포에서
+# 별도 네임스페이스로 분리해 관측 스택과 애플리케이션/데이터 계층을 명확히 구분한다.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quickchat-observability
+  labels:
+    app.kubernetes.io/part-of: quickchat

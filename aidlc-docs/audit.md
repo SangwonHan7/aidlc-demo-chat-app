@@ -451,3 +451,82 @@ Files Created:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(저장소 관리) - 승인 게이트 없음
 
 ---
+
+## Post-Workflow Next Steps - NAS 배포: k3s 매니페스트 작성 → docker-compose로 최종 결정 변경
+
+Timestamp: 2026-08-23T12:00:00Z ~ 2026-08-24T00:00:00Z
+User Input: "좋아 이제 nas에 배포하고 싶은데 뭘 해야 할까?" → (AskUserQuestion: docker-compose로 바로 배포 / k3s 매니페스트를 새로 작성 중 선택) "k3s 매니페스트를 새로 작성 (원래 설계대로)" → (이후 작업 도중) "미안 docker-compose로 변경하는걸로 할게"
+AI Response: 원래 승인된 Infrastructure Design(RAM 20GB 기준 k3s 권장)에 따라 사용자가 k3s 경로를 선택해 `infra/k3s/`에 전체 매니페스트를 작성함 - namespaces.yaml(quickchat-app/quickchat-data/quickchat-observability, observability 네임스페이스는 원 설계 문서에 없어 신규 추가), data/postgresql.yaml·redis.yaml·kafka.yaml(KRaft 단일 브로커, FQDN 기반 advertised listener)·vault.yaml(dev 모드, Backend가 실제로는 Vault를 연동하지 않는다는 설계-구현 간극을 주석으로 투명하게 기록), app/backend-deployment.yaml·backend-service.yaml·backend-config.yaml·frontend-deployment.yaml·frontend-service.yaml(NodePort 30080/30081, `imagePullPolicy: Never`, 시크릿은 매니페스트에 평문으로 넣지 않고 `kubectl create secret` 커맨드로 별도 생성하도록 설계), observability/prometheus.yaml·grafana.yaml(Backend `/actuator/prometheus`만 스크랩, Grafana에 Prometheus 데이터소스만 프로비저닝), scripts/kafka-topics.sh(`chat-messages` 토픽 명시적 생성, partitions=3)·vault-init.sh(KV 시크릿 엔진 활성화, Backend 미연동 범위 재확인) 작성 완료.
+이후 배포 런북 작성 단계로 넘어가기 전 사용자가 "미안 docker-compose로 변경하는걸로 할게"로 결정을 변경함 - k3s 매니페스트는 삭제하지 않고 참고/향후 확장용으로 저장소에 남겨두고, 실제 NAS 배포는 이미 로컬에서 검증된 `infra/docker-compose/docker-compose.yml`을 그대로 재사용하는 방향으로 전환. docker-compose.yml에 `NAS_HOST` 환경변수(기본값 `localhost`)를 추가해 `CORS_ALLOWED_ORIGIN`/`NEXT_PUBLIC_API_BASE_URL`/`NEXT_PUBLIC_WS_URL`이 로컬 개발과 NAS 배포 양쪽에 재사용되도록 수정(`.env.example` 신규 추가), `infra/docker-compose/README.md`(NAS 배포 런북: 사전조건, .env 설정, 빌드/기동, 검증, 알려진 제약 - 평문 개발용 자격증명/Vault 미연동/Kafka 비영속/HTTPS 미적용) 신규 작성, `deployment-architecture.md`에 "2026-08-24 정정" 섹션으로 이 결정 변경을 기록. docker-compose vs k3s는 설계 트레이드오프가 있는 갈래라 처음에는 AskUserQuestion으로 확인했고, 이번 재변경도 사용자의 명시적 요청이라 추가 확인 없이 바로 반영.
+Files Created:
+- infra/k3s/namespaces.yaml, infra/k3s/data/{postgresql,redis,kafka,vault}.yaml, infra/k3s/app/{backend-deployment,backend-service,backend-config,frontend-deployment,frontend-service}.yaml, infra/k3s/observability/{prometheus,grafana}.yaml, infra/scripts/{kafka-topics.sh,vault-init.sh} (참고용으로 유지)
+- infra/docker-compose/.env.example
+- infra/docker-compose/README.md
+Files Modified:
+- infra/docker-compose/docker-compose.yml (NAS_HOST 변수화)
+- aidlc-docs/construction/backend/infrastructure-design/deployment-architecture.md (2026-08-24 정정 섹션 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(배포) - 승인 게이트 없음. docker-compose 기반 NAS 배포 런북 완료 - 사용자가 실제 NAS에서 `docker compose up --build -d` 실행 후 결과 확인 대기
+
+---
+
+## Post-Workflow Next Steps - GitHub Actions CI/CD 구축
+
+Timestamp: 2026-08-24T01:00:00Z
+User Input: "gitlab cicd 구현하고 싶어" → (AskUserQuestion으로 범위 확인 시도 - 거부됨) → "github cicd 구현하고 싶어"
+AI Response: 사용자가 질문 흐름을 명시적으로 거부해 추가 확인 없이 합리적 기본 범위로 직접 구현. `git remote -v`로 실제 저장소가 GitHub(`SangwonHan7/aidlc-demo-chat-app`)임을 확인(GitLab 언급은 착오/변심으로 판단). 백엔드 테스트 전체를 재확인해 `@SpringBootTest` 전체 컨텍스트나 Testcontainers를 쓰는 테스트가 없음(전부 Mockito mock 기반 단위/슬라이스 테스트 + jqwik 속성 테스트)을 확인 - 별도 Postgres/Kafka/Redis 서비스 컨테이너 없이 CI 실행 가능.
+구현 범위(CI + 이미지 빌드/푸시까지, NAS로의 실제 자동 배포는 제외) - 가정용 NAS는 보통 외부에서 SSH로 직접 접근 불가능해 완전 자동배포에는 self-hosted runner 설치 등 별도 네트워크/신뢰 설계가 필요하므로, 그 갈래는 구현하지 않고 워크플로우 주석과 사용자 보고에 이유를 명시:
+- `.github/workflows/ci.yml`: 모든 브랜치 push + main 대상 PR에서 Backend(`./gradlew build`, JDK 17, Gradle 캐시)와 Frontend(`npm ci && npm test && npm run build`, Node 20, npm 캐시) 각각 독립 job으로 실행.
+- `.github/workflows/cd.yml`: main push 시 Backend/Frontend Docker 이미지를 빌드해 `ghcr.io`에 `latest`+커밋 SHA 태그로 푸시. `github.repository`에 대문자가 섞여 있으면(`SangwonHan7/...`) ghcr.io 태그 규칙(소문자만) 위반으로 빌드가 실패하는 것을 미리 인지해 소문자 변환 스텝을 추가. Frontend는 `NEXT_PUBLIC_*`가 빌드 시점에 정적 인라인되는 제약(이번 세션에서 여러 번 확인된 사항) 때문에 리포지토리 Variable `NAS_HOST`(Settings > Secrets and variables > Actions > Variables)를 build-arg로 주입하도록 구성, 미설정 시 `localhost`로 빌드됨을 주석으로 명시.
+- 두 워크플로우 모두 `python3 -c "yaml.safe_load(...)"`로 문법 유효성 검증 완료.
+Files Created:
+- .github/workflows/ci.yml
+- .github/workflows/cd.yml
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 구축) - 승인 게이트 없음. main에 push 시 실제로 워크플로우가 정상 동작하는지는 GitHub 쪽에서 사용자가 직접 확인 필요(이 세션 환경에서는 실제 GitHub Actions 실행 결과를 볼 수 없음) - `NAS_HOST` 리포지토리 Variable 설정 여부도 함께 확인 필요
+
+---
+
+## Post-Workflow Next Steps - NAS 자동배포 (self-hosted runner) 추가
+
+Timestamp: 2026-08-24T01:30:00Z
+User Input: "nas로의 자동배포까지 설정하고 싶어."
+AI Response: 직전 CD 워크플로우 보고에서 "SSH 기반 완전 자동배포는 별도 설계가 필요해 범위 밖으로 뒀다"고 안내했던 부분을 실제로 구현. 가정용 NAS는 공유기 뒤에 있어 인터넷에서 SSH로 직접 접근이 불가능한 경우가 대부분이라는 전제하에, NAS가 GitHub으로 나가는 방향으로만 연결하는 self-hosted runner 방식을 선택(인바운드 포트 개방 불필요) - 대안인 SSH 기반 배포는 포트포워딩/고정 IP(또는 DDNS) 등 이 세션에서 확인되지 않은 사용자의 네트워크 구성에 의존하므로 채택하지 않음.
+구현: (1) `infra/docker-compose/docker-compose.deploy.yml` 신규 - 기존 `docker-compose.yml`을 오버레이해 backend/frontend를 로컬 빌드 대신 `${GHCR_IMAGE_REPO}-backend:latest`/`-frontend:latest`(ghcr.io에 CD가 미리 푸시한 이미지)로 대체. (2) `cd.yml`에 `deploy` job 추가(`needs: [build-backend, build-frontend]`, `runs-on: [self-hosted, nas]`) - GHCR 로그인 → `docker compose ... pull backend frontend` → `up -d --no-build`(오버레이에 `build:`가 여전히 남아있으므로 `--no-build`로 재빌드 방지) → `/actuator/health`·`:3000` 헬스체크(최대 15회 재시도) → `docker image prune -f`. `actions/checkout`이 실행마다 작업 폴더를 정리(`git clean`)할 수 있어 `.env`가 지워질 위험이 있음을 인지해, 배포용 `.env`는 체크아웃 경로 밖의 고정 경로(`DEPLOY_ENV_FILE`, 예시값이라 실제 러너 사용자 홈 경로로 사용자가 직접 수정 필요)에 두도록 설계하고 `checkout`에는 `clean: false`도 함께 지정. (3) `infra/docker-compose/README.md`에 "6. GitHub Actions로 자동배포 설정" 섹션 추가 - 러너 설치/라벨(`nas`)/서비스 등록, 배포용 `.env` 준비, 리포지토리 Variable(`NAS_HOST`) 설정, 동작 확인, 이 방식의 알려진 제약(러너가 저장소에 병합 권한 있는 누구에게나 NAS 실행 권한을 주는 것과 같다는 신뢰 범위 경고 포함)까지 문서화.
+두 YAML 파일 모두 `python3 -c "yaml.safe_load(...)"`로 문법 유효성 검증 완료. `docker compose up --no-build` 플래그의 실제 동작(오버레이에 `build:` 키가 여전히 남아있어도 이미지가 이미 pull되어 있으면 재빌드하지 않음)은 문서 지식에 근거했고, 이 세션 sandbox에는 docker가 없어 실제 실행 검증은 하지 못함 - 사용자가 실제 러너 등록 후 최초 배포 시 확인 필요.
+Files Created:
+- infra/docker-compose/docker-compose.deploy.yml
+Files Modified:
+- .github/workflows/cd.yml (deploy job 추가)
+- infra/docker-compose/README.md (6번 섹션 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 확장) - 승인 게이트 없음. 사용자가 NAS에 self-hosted runner를 실제로 설치/등록하고 `DEPLOY_ENV_FILE` 경로를 자신의 환경에 맞게 수정한 뒤 최초 배포 결과 확인 필요
+
+---
+
+## Post-Workflow Next Steps - NAS 자동배포: self-hosted runner → SSH 기반으로 전환
+
+Timestamp: 2026-08-24T02:00:00Z
+User Input: "ssh 되니까 self-hosted runner 설치 안하는 방식으로 알려줘"
+AI Response: 직전에 self-hosted runner를 선택한 이유(가정용 NAS는 보통 인터넷에서 SSH로 직접 접근 불가)가 이번 사용자 환경에는 해당하지 않음(SSH 접근 가능)을 확인 - 전제가 달랐던 결정이므로 추가 확인 없이 바로 SSH 기반으로 교체.
+`.github/workflows/cd.yml`의 `deploy` job을 `runs-on: [self-hosted, nas]`에서 `runs-on: ubuntu-latest`(GitHub 호스팅 러너)로 변경하고, NAS로의 접속을 SSH로 수행하도록 재작성: `ssh-keyscan`으로 known_hosts를 등록한 뒤(`StrictHostKeyChecking` 우회 없이), `ssh ... bash -s <<EOF ... EOF` heredoc으로 원격 스크립트(GHCR 로그인 → `git pull --ff-only` → `docker compose pull/up --no-build` → `docker image prune` → 헬스체크)를 한 번에 전달. 헬스체크는 GitHub 호스팅 러너가 아니라 NAS 자신이 `localhost`로 수행하도록 원격 스크립트 안에 넣었다(8080/3000 포트가 인터넷에 열려 있다는 보장이 없어, 외부에서 직접 확인하면 SSH는 되지만 애플리케이션 포트는 안 열려 있는 경우 오탐 실패가 날 수 있기 때문).
+필요 시크릿을 self-hosted runner 방식보다 늘어난 4개(`NAS_SSH_HOST`/`NAS_SSH_PORT`/`NAS_SSH_USER`/`NAS_SSH_PRIVATE_KEY`)로 재정의 - 이전 방식의 `DEPLOY_ENV_FILE`(러너 로컬 경로)는 더 이상 필요 없어 제거. heredoc 안에서 로컬(러너) 쉘 변수(`$GHCR_TOKEN`, `$GHCR_IMAGE_REPO`)는 SSH로 보내기 전에 미리 치환되어야 하고, 원격에서 평가되어야 하는 부분(`for i in $(seq 1 15)`, `${i}`)은 `\$`로 이스케이프해 로컬에서 먼저 치환되지 않도록 구분 - `python3 -c yaml.safe_load`로 YAML 문법과 `bash -n`으로 heredoc 구조(터미네이터 `EOF`가 최종 스크립트에서 들여쓰기 없이 위치하는지, YAML 블록 스칼라의 공통 들여쓰기 제거 이후 기준)를 직접 검증. 이 세션 sandbox에는 실제 SSH 대상이 없어 end-to-end 실행 검증은 못 함.
+`infra/docker-compose/README.md`의 "6. GitHub Actions로 자동배포 설정"을 SSH 절차로 전면 재작성 - NAS 쪽 1회성 준비(저장소 clone 경로, `.env` 위치, 배포 전용 SSH 사용자/키 생성 권장, 비밀번호 로그인 비활성화/포트 변경/fail2ban 등 인터넷에 SSH를 여는 데 따른 일반적 노출 최소화 조치), 필요한 Secrets/Variables, 동작 확인, 알려진 제약(SSH 노출 자체의 위험, self-hosted runner가 오히려 나을 수 있는 경우도 한 줄로 언급)까지 포함. self-hosted runner 전용 지침은 제거.
+Files Modified:
+- .github/workflows/cd.yml (`deploy` job을 SSH 기반으로 재작성)
+- infra/docker-compose/README.md (6번 섹션을 SSH 절차로 재작성)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 방식 변경) - 승인 게이트 없음. 사용자가 NAS에 배포 전용 SSH 사용자/키를 준비하고 4개 Secrets(`NAS_SSH_HOST`/`PORT`/`USER`/`PRIVATE_KEY`)와 Variable(`NAS_HOST`)을 설정한 뒤 최초 배포 결과 확인 필요
+
+---
+
+## Post-Workflow Next Steps - NAS 자동배포: 저장소 clone 제거
+
+Timestamp: 2026-08-24T02:15:00Z
+User Input: "이미지 빌드 github에서 하니까 nas에서는 저장소 clone할 필요 없지 않아?"
+AI Response: 맞는 지적으로 확인 - 직전 SSH 기반 설계가 `cd ~/aidlc-demo-chat-app && git pull`을 포함하고 있었는데, 이미지가 이미 GitHub에서 빌드/푸시되므로 NAS는 `docker compose`가 참조할 두 YAML 파일(`docker-compose.yml`, `docker-compose.deploy.yml`)만 있으면 되고 backend/frontend 소스 코드는 전혀 필요 없음. `cd.yml`의 `deploy` job을 수정 - `actions/checkout`을 다시 추가해 GitHub 호스팅 러너가 최신 compose 파일을 갖도록 하고, NAS로는 `git clone`/`git pull` 대신 `scp`로 그 두 파일만 `~/quickchat-deploy/`에 매번 복사(`.env`는 스크립트가 건드리지 않아 최초 설정값 유지). 원격 실행 스크립트도 `cd ~/aidlc-demo-chat-app && git pull && cd infra/docker-compose`를 제거하고 `cd ~/quickchat-deploy`로 단순화.
+`infra/docker-compose/README.md` 6-1(NAS 쪽 준비)에서 "저장소 clone" 단계를 제거하고 `.env`만 준비하면 되도록 정정, 수동 방식(섹션 1~5, NAS에서 직접 빌드)을 병행하고 싶은 경우에는 여전히 별도 clone이 필요하다는 점과 두 경로의 디렉터리를 분리해서 섞이지 않게 하라는 안내를 추가. `docker-compose.deploy.yml`의 사용법 주석도 이에 맞게 수정.
+`python3 -c yaml.safe_load`와 `bash -n`(heredoc 터미네이터가 최종 스크립트에서 들여쓰기 없이 위치하는지까지)으로 재검증.
+Files Modified:
+- .github/workflows/cd.yml (`deploy` job: checkout 추가, git clone/pull 제거, scp로 compose 파일 전달)
+- infra/docker-compose/docker-compose.deploy.yml (사용법 주석 수정)
+- infra/docker-compose/README.md (6-1 저장소 clone 단계 제거)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 단순화) - 승인 게이트 없음
+
+---

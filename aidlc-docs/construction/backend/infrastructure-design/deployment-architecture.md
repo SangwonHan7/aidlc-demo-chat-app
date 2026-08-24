@@ -27,6 +27,9 @@ infra/
 5. nginx-ingress, Prometheus/Grafana 설치
 6. Frontend Deployment (Backend API 준비 완료 후 - unit-of-work.md의 개발 순서와 일치)
 
-## RAM 임계값에 따른 분기
+## RAM 임계값에 따른 분기 (원래 설계, 2026-08-24 아래 정정 참고)
 - 현재 상태(20GB 설치됨, 16GB 권장선 이상): k3s/ 매니페스트로 바로 진행
 - 참고용 축소 경로 - NAS RAM이 16GB 미만인 경우: docker-compose/docker-compose.yml로 로컬/NAS Docker에서 직접 실행 (레플리카 1개씩, Prometheus/Grafana 제외)
+
+## 2026-08-24 정정 - 실제 NAS 배포 경로는 docker-compose로 변경
+RAM 임계값상으로는 k3s가 권장 경로였고 실제로 `infra/k3s/`에 전체 매니페스트(namespaces, PostgreSQL/Kafka/Redis/Vault StatefulSet, Backend/Frontend Deployment, Prometheus/Grafana)를 작성했으나, 사용자가 최종적으로 단순성을 우선해 docker-compose 배포로 되돌리기로 결정했다. k3s 매니페스트는 삭제하지 않고 참고/향후 확장용으로 저장소에 남겨둔다. 실제 배포 절차는 `infra/docker-compose/README.md` 참고. 이 변경에 따라 `infra/docker-compose/docker-compose.yml`에 `NAS_HOST` 변수(`.env` 기반)를 추가해 `CORS_ALLOWED_ORIGIN`/`NEXT_PUBLIC_API_BASE_URL`/`NEXT_PUBLIC_WS_URL`이 로컬 개발과 NAS 배포 양쪽에서 재사용 가능하도록 했다.

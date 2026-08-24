@@ -1,0 +1,68 @@
+# Redis - quickchat-data 네임스페이스 (단일 인스턴스, NFR Design Question 5 답변 A)
+# 리소스: request 128Mi/0.1 vCPU, limit 256Mi/0.25 vCPU
+# (infra/docker-compose/docker-compose.yml의 redis:7-alpine과 동일 이미지)
+#
+# Refresh Token(RefreshTokenRedisService)과 로그인 잠금 카운터가 Redis에만 저장되므로, 재시작 시
+# 데이터가 사라지면 사용자 전체 로그아웃/잠금 해제 같은 부수효과가 있다 - 작은 PVC로 최소한의
+# 재시작 내구성을 확보한다(고가용성 구성은 아님, 단일 인스턴스라는 기존 NFR 결정 그대로 유지).
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: quickchat-data
+  labels:
+    app: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args: ["--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: quickchat-data
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379

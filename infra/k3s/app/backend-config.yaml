@@ -1,0 +1,18 @@
+# Backend용 민감하지 않은 환경변수. 민감값(DB_PASSWORD/JWT_SECRET)은 backend-secrets Secret으로
+# 별도 관리한다(배포 런북 참고, 이 파일에는 넣지 않음).
+#
+# CORS_ALLOWED_ORIGIN의 <NAS_HOST>는 실제 배포 전에 반드시 NAS의 실제 접속 주소(LAN IP 또는
+# quickchat.local 같은 로컬 호스트명)로 바꿔야 한다 - Frontend가 이 origin에서 서빙되므로, 여기 값이
+# 실제와 다르면 브라우저가 CORS 오류로 REST 호출을 막는다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: quickchat-app
+data:
+  DB_URL: "jdbc:postgresql://postgres.quickchat-data.svc.cluster.local:5432/quickchat"
+  DB_USERNAME: "quickchat"
+  REDIS_HOST: "redis.quickchat-data.svc.cluster.local"
+  REDIS_PORT: "6379"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.quickchat-data.svc.cluster.local:9092"
+  CORS_ALLOWED_ORIGIN: "http://<NAS_HOST>:30080"

@@ -1,0 +1,83 @@
+# Grafana - quickchat-observability 네임스페이스
+# 리소스: request 128Mi/0.1 vCPU, limit 256Mi/0.25 vCPU
+#
+# 관리자 비밀번호는 이 파일에 평문으로 넣지 않는다 - 배포 전 아래 명령으로 Secret을 먼저 만든다
+# (배포 런북 참고):
+#   kubectl create secret generic grafana-credentials -n quickchat-observability \
+#     --from-literal=GF_SECURITY_ADMIN_PASSWORD='<직접 정한 비밀번호>'
+#
+# 대시보드는 미리 만들어두지 않았다(이번 배포 범위에서는 Prometheus 데이터소스 연결까지만 - 커스텀
+# 대시보드 구성은 실제 운영 지표를 보면서 추가하는 것이 더 의미 있다고 판단해 범위 밖으로 뒀다).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: quickchat-observability
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus.quickchat-observability.svc.cluster.local:9090
+        isDefault: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: quickchat-observability
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.1.0
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-credentials
+                  key: GF_SECURITY_ADMIN_PASSWORD
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana-datasources
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: quickchat-observability
+spec:
+  type: NodePort
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30300

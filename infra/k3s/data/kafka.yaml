@@ -1,0 +1,91 @@
+# Kafka (KRaft 단일 브로커) - quickchat-data 네임스페이스
+# 리소스: request 512Mi/0.5 vCPU, limit 1Gi/1 vCPU, JVM 힙 -Xmx512m -Xms256m
+# (infra/docker-compose/docker-compose.yml의 bitnamilegacy/kafka:3.7 설정을 그대로 이식 - 2026-08-21
+# Post-Workflow 수정으로 bitnami/kafka:3.7이 bitnamilegacy/kafka:3.7로 바뀐 것 참고)
+#
+# ADVERTISED_LISTENERS는 "kafka"(같은 네임스페이스 내 짧은 이름)가 아니라 FQDN
+# (kafka.quickchat-data.svc.cluster.local)을 사용한다 - Backend가 quickchat-app이라는 다른
+# 네임스페이스에 있어서 짧은 이름만으로는 resolve되지 않기 때문.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: quickchat-data
+  labels:
+    app: kafka
+spec:
+  serviceName: kafka
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: bitnamilegacy/kafka:3.7
+          env:
+            - name: KAFKA_CFG_NODE_ID
+              value: "1"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+              value: "1@kafka.quickchat-data.svc.cluster.local:9093"
+            - name: KAFKA_CFG_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka.quickchat-data.svc.cluster.local:9092"
+            - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xmx512m -Xms256m"
+          ports:
+            - containerPort: 9092
+              name: kafka
+            - containerPort: 9093
+              name: controller
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /bitnami/kafka
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 15
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: quickchat-data
+spec:
+  selector:
+    app: kafka
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: 9092
+    - name: controller
+      port: 9093
+      targetPort: 9093
