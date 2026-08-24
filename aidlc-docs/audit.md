@@ -566,3 +566,18 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 배포 성공 여부 확인 필요. 만약 이 두 조치로도 안 되면 NAS에서 `which docker`로 실제 바이너리 경로를 확인해 PATH에 직접 추가해야 함
 
 ---
+
+## Post-Workflow Next Steps - CD 배포 실패 수정 (포트 충돌: compose 프로젝트 이름 불일치)
+
+Timestamp: 2026-08-24T03:45:00Z
+User Input: "아래 에러 발생해 확인해줘\nError response from daemon: driver failed programming external connectivity on endpoint quickchat-deploy-postgres-1 (...): Error starting userland proxy: listen tcp4 0.0.0.0:5432: bind: address already in use"
+AI Response: `up -d --no-build`(서비스 이름 없이 실행)이 실제로는 backend/frontend만이 아니라 docker-compose.yml에 정의된 6개 서비스 전체(postgres/redis/kafka/vault 포함)를 대상으로 함을 재확인 - `pull backend frontend`에는 서비스 필터가 있었지만 `up -d --no-build`에는 빠져있던 실수. 이것만으로도 버그지만, 에러 메시지의 컨테이너 이름(`quickchat-deploy-postgres-1`)을 보고 더 근본적인 문제를 발견: docker compose는 `-p`/`COMPOSE_PROJECT_NAME`을 지정하지 않으면 실행 디렉터리 이름으로 프로젝트를 구분하는데, 수동 배포(보통 `~/aidlc-demo-chat-app/infra/docker-compose`에서 실행, 프로젝트명 `docker-compose`류)와 자동배포(`~/quickchat-deploy`에서 실행, 프로젝트명 `quickchat-deploy`)가 디렉터리 이름이 달라 서로 다른 프로젝트/네트워크로 인식됨 - 그래서 자동배포가 `up -d`를 실행하면 이미 수동으로 띄워진 postgres와 같은 호스트 포트(5432)를 새 프로젝트에서 또 열려다 충돌. 이 문제를 그냥 두면 포트 필터를 고쳐도(backend/frontend만 재기동) 다음 문제(서로 다른 네트워크라 backend가 postgres/redis/kafka 호스트명을 못 찾는 문제)로 바로 이어질 것이 확실해, 서비스 필터 추가와 프로젝트 이름 고정을 함께 처리 - 설계 트레이드오프 없는 명백한 버그 조합으로 판단해 질문 없이 직접 수정.
+수정: (1) `cd.yml`의 `up -d --no-build`에 `backend frontend` 서비스 필터 추가(이미 있던 `pull`과 대칭). (2) `.env.example`에 `COMPOSE_PROJECT_NAME=quickchat` 추가 - 수동/자동배포 양쪽 `.env`에 동일 값을 넣으면 실행 디렉터리가 달라도 같은 프로젝트로 취급됨. (3) `README.md`에 2번(수동)과 6-1(자동) 양쪽에 이 값을 반드시 일치시키라는 안내 추가, 6-3의 오래된 `git pull` 언급(저장소 clone 제거 이후 남아있던 문구) 정리, 6-5 "문제 해결" 섹션 신규 추가 - 지금 사용자가 겪은 정확한 증상과 원인, 이미 서로 다른 프로젝트로 떠버린 상태를 정리하는 복구 절차(`docker ps -a`로 확인 → 잘못된 프로젝트명으로 `down` → 올바른 위치에서 `COMPOSE_PROJECT_NAME` 맞춘 뒤 재기동)까지 포함.
+`python3 -c yaml.safe_load`로 재검증.
+Files Modified:
+- .github/workflows/cd.yml (`up -d --no-build` → `up -d --no-build backend frontend`)
+- infra/docker-compose/.env.example (`COMPOSE_PROJECT_NAME=quickchat` 추가)
+- infra/docker-compose/README.md (2번/6-1 안내 추가, 6-3 문구 정리, 6-5 신규 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. 사용자가 현재 충돌 상태인 컨테이너를 6-5 절차대로 정리하고 두 `.env`의 `COMPOSE_PROJECT_NAME`을 맞춘 뒤 재배포 결과 확인 필요
+
+---

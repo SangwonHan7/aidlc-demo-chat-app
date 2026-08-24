@@ -161,7 +161,7 @@ jobs:
             cd ~/quickchat-deploy
             export GHCR_IMAGE_REPO="$GHCR_IMAGE_REPO"
             docker compose --env-file .env -f docker-compose.yml -f docker-compose.deploy.yml pull backend frontend
-            docker compose --env-file .env -f docker-compose.yml -f docker-compose.deploy.yml up -d --no-build
+            docker compose --env-file .env -f docker-compose.yml -f docker-compose.deploy.yml up -d --no-build backend frontend
             docker image prune -f
             for i in \$(seq 1 15); do
               if curl -sf http://localhost:8080/actuator/health >/dev/null && curl -sf http://localhost:3000 >/dev/null; then

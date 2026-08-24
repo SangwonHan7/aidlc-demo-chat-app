@@ -21,6 +21,8 @@ cp .env.example .env
 ```
 `.env`를 열어 `NAS_HOST`를 NAS의 실제 LAN IP 또는 호스트명으로 바꾼다. 브라우저가 직접 접속하는 주소이므로 `localhost`를 그대로 두면 NAS가 아닌 다른 기기에서 접속할 때 API/WebSocket 호출이 실패한다.
 
+`COMPOSE_PROJECT_NAME=quickchat`는 값을 그대로 두고, 6번(자동배포)을 함께 쓸 계획이라면 `~/quickchat-deploy/.env`에도 **똑같이** 이 값을 넣어야 한다 - docker compose는 기본적으로 실행 디렉터리 이름으로 프로젝트를 구분해서, 이 값이 다르면 여기서 띄운 postgres/redis/kafka/vault와 자동배포가 다루는 backend/frontend가 서로 다른 네트워크로 나뉘어 컨테이너 이름이 못 찾거나 포트가 충돌한다(6-5 참고).
+
 ## 3. 빌드 및 기동
 ```bash
 docker compose up --build -d
@@ -57,6 +59,7 @@ docker compose logs -f frontend
    # .env.example 내용을 참고해 ~/quickchat-deploy/.env를 직접 만들고 NAS_HOST를 실제 주소로 채운다
    # (.env.example은 이 저장소의 infra/docker-compose/.env.example에서 내용만 복사해오면 된다)
    ```
+   `COMPOSE_PROJECT_NAME=quickchat`을 반드시 포함하고, 2번(수동 배포)에서 쓴 `.env`와 **동일한 값**으로 맞춘다 - 값이 다르면 postgres/redis/kafka/vault(수동으로 띄운 것)와 backend/frontend(자동배포가 재기동하는 것)가 서로 다른 프로젝트로 인식되어 통신이 안 되거나 포트가 충돌한다.
 2. 배포 전용 SSH 사용자/키를 별도로 만드는 것을 권장한다(기존 관리자 계정을 그대로 쓰기보다 권한을 좁힐 수 있음):
    ```bash
    ssh-keygen -t ed25519 -f deploy_key -C "github-actions-deploy" -N ""
@@ -73,13 +76,30 @@ Settings → Secrets and variables → Actions에서:
 - **Variables**: `NAS_HOST`(프론트엔드 이미지 빌드 시 `NEXT_PUBLIC_*`에 baked-in되는 값 - `~/quickchat-deploy/.env`의 `NAS_HOST`와 같은 값을 넣는다. 외부 접속 주소인 `NAS_SSH_HOST`와는 다를 수 있음 - 예를 들어 SSH는 공유기의 외부 포트를 통해 들어오지만, 브라우저가 접속할 주소는 사설 IP인 경우)
 
 ### 6-3. 동작 확인
-`main`에 커밋을 push한 뒤 저장소의 Actions 탭에서 `CD - Build, Push & Deploy` 워크플로우가 `build-backend`/`build-frontend`/`deploy` 3개 job 모두 성공하는지 확인한다. `deploy` job 로그에서 SSH 접속, `git pull`, `docker compose pull/up`, 헬스체크(NAS 자신이 `localhost:8080`/`:3000`으로 확인) 결과를 볼 수 있다.
+`main`에 커밋을 push한 뒤 저장소의 Actions 탭에서 `CD - Build, Push & Deploy` 워크플로우가 `build-backend`/`build-frontend`/`deploy` 3개 job 모두 성공하는지 확인한다. `deploy` job 로그에서 SSH 접속, compose 파일 전달, `docker compose pull/up`, 헬스체크(NAS 자신이 `localhost:8080`/`:3000`으로 확인) 결과를 볼 수 있다.
 
 ### 6-4. 이 방식의 알려진 제약
 - 완전 자동화가 필요 없다면 이 섹션은 건너뛰고 위 1~5단계(수동 `docker compose up --build -d`)만으로도 충분하다.
 - SSH를 인터넷에 노출하는 구성이므로, 배포 전용 사용자/키로 권한을 좁히고 6-1의 4번 권장 조치를 적용할 것.
-- `deploy` job은 백엔드/프런트엔드 컨테이너만 재기동한다(`pull backend frontend`, `up -d --no-build`) - PostgreSQL/Kafka/Redis/Vault는 건드리지 않는다.
+- `deploy` job은 백엔드/프런트엔드 컨테이너만 재기동한다(`pull backend frontend`, `up -d --no-build backend frontend`) - PostgreSQL/Kafka/Redis/Vault는 건드리지 않는다. 단, 이게 실제로 성립하려면 6-5처럼 프로젝트 이름이 일치해야 한다.
 - NAS가 SSH로만 접근 가능하고 외부에서 열려 있지 않다면(포트포워딩 미설정 등), 이 방식 대신 NAS에 GitHub Actions self-hosted runner를 설치하는 방식(NAS가 GitHub 쪽으로 나가는 연결만 사용, 인바운드 포트 불필요)을 고려할 수 있다.
+
+### 6-5. 문제 해결 - 포트 충돌("address already in use") / 서비스를 못 찾는 문제
+`docker compose up`은 실행 디렉터리 이름을 프로젝트 이름으로 쓴다(`-p`/`COMPOSE_PROJECT_NAME` 미지정 시). 수동 배포는 보통 `~/aidlc-demo-chat-app/infra/docker-compose`에서, 자동배포는 `~/quickchat-deploy`에서 실행되므로 디렉터리 이름이 다르면 서로 다른 프로젝트로 인식된다. 이 상태에서 자동배포가 `up -d`를 실행하면 이미 수동으로 띄워둔 postgres 등과 같은 호스트 포트(5432 등)를 새 프로젝트에서 또 열려고 해서 `bind: address already in use` 에러가 난다(실제로 겪은 에러).
+
+**해결**: 두 위치의 `.env`에 `COMPOSE_PROJECT_NAME=quickchat`을 동일하게 넣어 프로젝트 이름을 고정한다(`.env.example`에 이미 포함됨). 이미 서로 다른 프로젝트 이름으로 컨테이너가 떠 있는 상태라면 한쪽을 정리해야 한다:
+```bash
+# 지금 떠 있는 컨테이너와 프로젝트 이름을 확인
+docker ps -a --format "table {{.Names}}\t{{.Ports}}"
+
+# 잘못된 프로젝트 이름으로 뜬 스택 정리(예: quickchat-deploy로 뜬 것)
+docker compose -p quickchat-deploy -f docker-compose.yml -f docker-compose.deploy.yml down
+
+# 그 다음 postgres/redis/kafka/vault가 있는 원래 디렉터리에서 .env에 COMPOSE_PROJECT_NAME=quickchat을
+# 넣은 뒤 전체를 한 번 다시 올린다
+docker compose up --build -d
+```
+이후 자동배포가 실행되면 같은 `quickchat` 프로젝트 안에서 backend/frontend만 갈아끼우게 된다.
 
 ## 참고: k3s 매니페스트
 `infra/k3s/`에 namespaces/data/app/observability 매니페스트가 이미 작성되어 있다(원래 설계에 따른 k3s 배포 경로). 이번에는 사용하지 않지만, 추후 다중 노드/오토스케일링/롤링 업데이트가 필요해지면 참고할 수 있도록 남겨둔다.
