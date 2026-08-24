@@ -143,14 +143,20 @@ jobs:
       # 건드리지 않는다(NAS_HOST 등 실제 값이 들어있어 매번 덮어쓰면 안 됨). 헬스체크는 GitHub
       # 호스팅 러너가 아니라 NAS 자신이 localhost로 확인한다 - 8080/3000 포트가 인터넷에 열려있다는
       # 보장이 없기 때문.
+      # ssh로 원격 명령을 비대화식(non-interactive)으로 실행하면 로그인 셸이 아니라서 ~/.profile,
+      # ~/.bashrc 등을 안 읽어 PATH에 docker가 없을 수 있다("docker: command not found", exit 127
+      # 로 실제로 겪은 에러) - Synology는 Container Manager/Docker 패키지 바이너리가 보통
+      # /usr/local/bin에 있는데 이게 기본 PATH에 안 잡히는 경우가 있어, bash를 로그인 셸(-l)로
+      # 띄우고 PATH에도 명시적으로 추가해 이중으로 방어한다.
       - name: Pull latest images and restart (remote)
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_IMAGE_REPO: ${{ env.REGISTRY }}/${{ env.IMAGE_REPO }}
         run: |
           ssh -i ~/.ssh/deploy_key -p "${{ secrets.NAS_SSH_PORT }}" \
-            "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}" bash -s <<EOF
+            "${{ secrets.NAS_SSH_USER }}@${{ secrets.NAS_SSH_HOST }}" bash -l -s <<EOF
             set -e
+            export PATH="\$PATH:/usr/local/bin:/usr/local/sbin"
             echo "$GHCR_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd ~/quickchat-deploy
             export GHCR_IMAGE_REPO="$GHCR_IMAGE_REPO"

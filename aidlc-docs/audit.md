@@ -554,3 +554,15 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 배포 성공 여부 확인 필요
 
 ---
+
+## Post-Workflow Next Steps - CD 배포 실패 수정 (docker: command not found)
+
+Timestamp: 2026-08-24T03:30:00Z
+User Input: "첨부한 이미지 에러 발생하고 있어 확인해줘" (스크린샷: `Pull latest images and restart (remote)` 스텝에서 `bash: line 2: docker: command not found`, `Error: Process completed with exit code 127`)
+AI Response: `ssh ... bash -s <<EOF`로 원격 명령을 실행하면 로그인 셸이 아닌 비대화식 셸이 되어 `~/.profile`/`~/.bashrc` 등을 읽지 않고, sshd가 부여하는 최소 기본 PATH만 쓰게 되는 것이 원인으로 판단 - Synology의 Container Manager/Docker 패키지 바이너리는 보통 `/usr/local/bin`에 있는데, 이 경로가 비로그인 셸의 기본 PATH에 없을 수 있음. 이중으로 방어: (1) `bash -s`를 `bash -l -s`로 바꿔 로그인 셸로 띄워 프로필 스크립트가 PATH를 보정할 기회를 주고, (2) 원격 스크립트 맨 앞에 `export PATH="\$PATH:/usr/local/bin:/usr/local/sbin"`을 명시적으로 추가해 로그인 셸에서도 안 잡히는 경우까지 커버. 설계 트레이드오프 없는 순수 버그 수정으로 판단해 질문 없이 직접 처리.
+heredoc 안에서 로컬(러너) 쉘이 먼저 치환하면 안 되는 `\$PATH`는 이스케이프해 원격에서 평가되도록 유지(기존 `\$(seq 1 15)`/`\${i}` 패턴과 동일). `python3 -c yaml.safe_load`와 `bash -n`으로 재검증.
+Files Modified:
+- .github/workflows/cd.yml (`Pull latest images and restart (remote)`: `bash -s` → `bash -l -s`, PATH 명시적 추가)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 버그 수정) - 승인 게이트 없음. main에 재push 또는 재실행으로 실제 배포 성공 여부 확인 필요. 만약 이 두 조치로도 안 되면 NAS에서 `which docker`로 실제 바이너리 경로를 확인해 PATH에 직접 추가해야 함
+
+---
