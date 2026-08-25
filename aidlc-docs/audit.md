@@ -610,3 +610,16 @@ Files Modified:
 Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(CI/CD 설정 변경) - 승인 게이트 없음. 사용자가 공유기에 9000번 포트포워딩(외부 9000 → NAS LAN IP:9000)을 등록하고, `docker compose up --build -d`(frontend는 build-arg가 바뀌었으므로 반드시 재빌드) 재실행 후 실제 접속 확인 필요
 
 ---
+
+## Post-Workflow Next Steps - 루트 README.md 정리
+
+Timestamp: 2026-08-25T00:15:00Z
+User Input: "좋아! git readme 파일 정리해줘" → "좋아! 이제 git readme 파일 정리해줘" (같은 요청 재확인)
+AI Response: 루트 `README.md`를 실제로 읽어보니 두 가지 문제 발견 - (1) "폴더 구성" 트리가 Workspace Detection 당시(Greenfield, 아무 코드도 없던 시점) 기준으로만 작성되어 있어 그 이후 실제로 생긴 `backend/`, `frontend/`, `infra/`, `aidlc-docs/`, `.github/workflows/`, `.gstack/`가 전혀 반영되어 있지 않았음. (2) 파일 맨 끝에 `# aidlc-demo-chat-app`이 깨진 형태(`#   a i d l c - d e m o - c h a t - a p p`처럼 글자 사이에 공백이 낀 모습)로 붙어있었는데, `xxd`로 실제 바이트를 확인해 UTF-16LE로 인코딩된 텍스트(각 ASCII 문자 뒤에 0x00 널바이트, 끝에 CRLF)가 UTF-8 파일 뒤에 그대로 붙어버린 것임을 확인 - GitHub에서 "Initialize repo with README" 등으로 생성된 기본 README 내용이 Windows/PowerShell 환경에서 다른 인코딩으로 잘못 append된 전형적인 흔적으로 판단. Read/Edit 도구가 이 구간을 있는 그대로 문자열 매칭하지 못해(인코딩 혼재로 보이는 문자가 실제 바이트와 다르게 표시됨) `python3`으로 정확한 바이트 오프셋을 찾아 해당 구간부터 파일을 잘라내는 방식으로 제거.
+내용 보강: "폴더 구성" 트리에 실제 생긴 디렉터리 전부 추가(각 항목에 무엇인지 + 관련 README 경로 주석). 신규 "애플리케이션 실행하기" 섹션 추가 - docker-compose 빠른 시작 명령과 backend/frontend/infra 하위 README, audit.md로의 링크 정리(중복 설명 없이 안내만). 기존 AI-DLC 데모 진행 가이드(사전 준비~실제 팀 프로젝트에 적용하기)는 여전히 유효한 내용이라 그대로 유지, 새 섹션은 그 앞에 배치.
+설계 트레이드오프 없는 문서 정리/버그(인코딩 아티팩트) 수정으로 판단해 질문 없이 직접 처리.
+Files Modified:
+- README.md (폴더 구성 갱신, "애플리케이션 실행하기" 섹션 추가, 파일 끝 UTF-16LE 깨진 아티팩트 제거)
+Context: AI-DLC 게이트 워크플로우 종료 이후의 통상적 엔지니어링 후속 작업(저장소 문서 정리) - 승인 게이트 없음
+
+---
